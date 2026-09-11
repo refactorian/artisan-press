@@ -30,16 +30,24 @@ class AdminPanelProvider extends PanelProvider
             ->login()
             ->profile()
             ->darkMode()
+            ->databaseNotifications()
+            ->databaseNotificationsPolling('30s')
             ->brandName('Blog Admin')
             ->colors([
                 'primary' => Color::Violet,
-                'gray'    => Color::Slate,
+                'gray' => Color::Slate,
             ])
             ->navigationGroups([
                 NavigationGroup::make()
                     ->label('Content'),
                 NavigationGroup::make()
                     ->label('Taxonomy'),
+                NavigationGroup::make()
+                    ->label('Engagement'),
+                NavigationGroup::make()
+                    ->label('Navigation & Structure'),
+                NavigationGroup::make()
+                    ->label('Settings & Audit'),
                 NavigationGroup::make()
                     ->label('Users & Access'),
             ])

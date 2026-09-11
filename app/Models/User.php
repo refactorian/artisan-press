@@ -10,19 +10,34 @@ use Filament\Panel;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Spatie\Activitylog\Models\Concerns\HasActivity;
+use Spatie\Activitylog\Support\LogOptions;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\Permission\Traits\HasRoles;
 
-#[Fillable(['name', 'email', 'password', 'avatar', 'bio', 'is_active'])]
+#[Fillable([
+    'name',
+    'email',
+    'password',
+    'avatar',
+    'bio',
+    'job_title',
+    'pronouns',
+    'website_url',
+    'social_links',
+    'is_featured_author',
+    'is_active',
+])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable implements FilamentUser, HasAvatar, HasMedia
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, HasRoles, InteractsWithMedia, Notifiable;
+    use HasActivity, HasFactory, HasRoles, InteractsWithMedia, Notifiable;
 
     /**
      * Get the attributes that should be cast.
@@ -33,9 +48,19 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, HasMedia
     {
         return [
             'email_verified_at' => 'datetime',
-            'password'          => 'hashed',
-            'is_active'         => 'boolean',
+            'password' => 'hashed',
+            'is_active' => 'boolean',
+            'is_featured_author' => 'boolean',
+            'social_links' => 'array',
         ];
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['name', 'email', 'is_active'])
+            ->logOnlyDirty()
+            ->dontLogEmptyChanges();
     }
 
     /**
@@ -61,5 +86,17 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, HasMedia
     public function posts(): HasMany
     {
         return $this->hasMany(Post::class);
+    }
+
+    public function contributedPosts(): BelongsToMany
+    {
+        return $this->belongsToMany(Post::class, 'post_user')
+            ->withPivot('role')
+            ->withTimestamps();
+    }
+
+    public function comments(): HasMany
+    {
+        return $this->hasMany(Comment::class);
     }
 }

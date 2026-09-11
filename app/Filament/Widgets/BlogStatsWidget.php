@@ -2,10 +2,12 @@
 
 namespace App\Filament\Widgets;
 
+use App\Enums\CommentStatus;
 use App\Enums\PostStatus;
-use App\Models\Category;
+use App\Enums\SubscriberStatus;
+use App\Models\Comment;
 use App\Models\Post;
-use App\Models\Tag;
+use App\Models\Subscriber;
 use App\Models\User;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
@@ -16,51 +18,39 @@ class BlogStatsWidget extends BaseWidget
 
     protected function getStats(): array
     {
-        $totalPosts      = Post::withTrashed()->count();
-        $publishedPosts  = Post::where('status', PostStatus::Published)->count();
-        $draftPosts      = Post::where('status', PostStatus::Draft)->count();
-        $scheduledPosts  = Post::where('status', PostStatus::Scheduled)->count();
-        $totalCategories = Category::count();
-        $totalTags       = Tag::count();
-        $totalUsers      = User::count();
-
-        // Posts published this month vs last month
-        $thisMonth  = Post::where('status', PostStatus::Published)
-            ->whereMonth('published_at', now()->month)
-            ->whereYear('published_at', now()->year)
-            ->count();
-        $lastMonth  = Post::where('status', PostStatus::Published)
-            ->whereMonth('published_at', now()->subMonth()->month)
-            ->whereYear('published_at', now()->subMonth()->year)
-            ->count();
-        $trend      = $lastMonth > 0 ? round((($thisMonth - $lastMonth) / $lastMonth) * 100, 1) : 100;
-        $trendColor = $trend >= 0 ? 'success' : 'danger';
+        $publishedPosts = Post::where('status', PostStatus::Published)->count();
+        $draftPosts = Post::where('status', PostStatus::Draft)->count();
+        $totalViews = Post::sum('view_count');
+        $pendingComments = Comment::where('status', CommentStatus::Pending)->count();
+        $subscribers = Subscriber::where('status', SubscriberStatus::Subscribed)->count();
+        $authors = User::where('is_active', true)->count();
 
         return [
-            Stat::make('Total Posts', $totalPosts)
-                ->description("{$publishedPosts} published · {$draftPosts} draft · {$scheduledPosts} scheduled")
+            Stat::make('Published Posts', $publishedPosts)
+                ->description("{$draftPosts} drafts awaiting publication")
                 ->descriptionIcon('heroicon-m-document-text')
+                ->chart([3, 7, 12, 15, 18, 22, $publishedPosts])
                 ->color('primary'),
 
-            Stat::make('Published This Month', $thisMonth)
-                ->description(($trend >= 0 ? '+' : '').$trend.'% vs last month')
-                ->descriptionIcon($trend >= 0 ? 'heroicon-m-arrow-trending-up' : 'heroicon-m-arrow-trending-down')
-                ->color($trendColor),
+            Stat::make('Total Post Views', number_format($totalViews))
+                ->description('All-time article views')
+                ->descriptionIcon('heroicon-m-arrow-trending-up')
+                ->color('success'),
 
-            Stat::make('Categories', $totalCategories)
-                ->description('Blog categories')
-                ->descriptionIcon('heroicon-m-folder')
-                ->color('warning'),
+            Stat::make('Comments to Moderate', $pendingComments)
+                ->description($pendingComments > 0 ? 'Requires attention' : 'Moderation inbox clear')
+                ->descriptionIcon('heroicon-m-chat-bubble-left-right')
+                ->color($pendingComments > 0 ? 'warning' : 'success'),
 
-            Stat::make('Tags', $totalTags)
-                ->description('Post tags')
-                ->descriptionIcon('heroicon-m-tag')
+            Stat::make('Active Subscribers', number_format($subscribers))
+                ->description('Newsletter audience')
+                ->descriptionIcon('heroicon-m-envelope-open')
                 ->color('info'),
 
-            Stat::make('Authors', $totalUsers)
-                ->description('Registered users')
+            Stat::make('Active Authors', $authors)
+                ->description('Blog team contributors')
                 ->descriptionIcon('heroicon-m-users')
-                ->color('success'),
+                ->color('gray'),
         ];
     }
 }

@@ -8,8 +8,8 @@ This repository contains a Laravel application. Complete the following setup bef
 Verify that PHP and Composer are available:
 
 ```sh
-php -v
-composer -V
+sail php -v
+sail composer -V
 ```
 
 If either command is unavailable, detect the user's operating system and install the prerequisites with the appropriate command:
@@ -39,8 +39,8 @@ After installation, ask the user to restart their terminal. If the agent needs t
 Install Laravel Boost from the application root before making application changes:
 
 ```sh
-composer require laravel/boost --dev
-php artisan boost:install
+sail composer require laravel/boost --dev
+sail php artisan boost:install
 ```
 
 Boost replaces these bootstrap instructions with guidelines tailored to the application. After installation, read `AGENTS.md` again and continue with the user's original request using the generated guidelines.

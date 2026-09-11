@@ -5,6 +5,8 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\UserResource\Pages;
 use App\Models\User;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -19,10 +21,10 @@ use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Hash;
-use Spatie\Permission\Models\Role;
 
 class UserResource extends Resource
 {
@@ -41,12 +43,12 @@ class UserResource extends Resource
                 ->columns(2)
                 ->schema([
                     TextInput::make('name')
-                        ->label('Name')
+                        ->label('Full Name')
                         ->required()
                         ->maxLength(255),
 
                     TextInput::make('email')
-                        ->label('Email')
+                        ->label('Email Address')
                         ->email()
                         ->required()
                         ->maxLength(255)
@@ -69,28 +71,76 @@ class UserResource extends Resource
                         ->searchable(),
 
                     Toggle::make('is_active')
-                        ->label('Active')
+                        ->label('Active Account')
                         ->default(true),
+
+                    Toggle::make('is_featured_author')
+                        ->label('Featured Author')
+                        ->helperText('Spotlight this author on team and author listings.'),
                 ]),
 
-            Section::make('Profile')
-                ->columns(1)
+            Section::make('Author Profile & Bio')
                 ->schema([
-                    FileUpload::make('avatar')
-                        ->label('Avatar')
-                        ->image()
-                        ->disk('public')
-                        ->directory('avatars')
-                        ->imageResizeMode('cover')
-                        ->imageCropAspectRatio('1:1')
-                        ->imageResizeTargetWidth('256')
-                        ->imageResizeTargetHeight('256')
-                        ->maxSize(2048),
+                    Grid::make(3)->schema([
+                        FileUpload::make('avatar')
+                            ->label('Profile Avatar')
+                            ->image()
+                            ->disk('public')
+                            ->directory('avatars')
+                            ->imageResizeMode('cover')
+                            ->imageCropAspectRatio('1:1')
+                            ->imageResizeTargetWidth('256')
+                            ->imageResizeTargetHeight('256')
+                            ->maxSize(2048),
+
+                        Grid::make(1)->columnSpan(2)->schema([
+                            Grid::make(2)->schema([
+                                TextInput::make('job_title')
+                                    ->label('Role / Job Title')
+                                    ->placeholder('e.g. Lead Developer, Technical Writer'),
+
+                                TextInput::make('pronouns')
+                                    ->label('Pronouns')
+                                    ->placeholder('e.g. they/them, she/her, he/him'),
+                            ]),
+
+                            TextInput::make('website_url')
+                                ->label('Personal / Portfolio Website')
+                                ->url()
+                                ->placeholder('https://example.com'),
+                        ]),
+                    ]),
 
                     Textarea::make('bio')
-                        ->label('Bio')
+                        ->label('Author Biography')
                         ->rows(4)
-                        ->maxLength(500),
+                        ->maxLength(1000)
+                        ->helperText('A short bio shown on articles and author profile pages.'),
+
+                    Repeater::make('social_links')
+                        ->label('Author Social Profiles')
+                        ->schema([
+                            Grid::make(2)->schema([
+                                Select::make('platform')
+                                    ->options([
+                                        'twitter' => 'Twitter / X',
+                                        'github' => 'GitHub',
+                                        'linkedin' => 'LinkedIn',
+                                        'youtube' => 'YouTube',
+                                        'facebook' => 'Facebook',
+                                        'instagram' => 'Instagram',
+                                        'website' => 'Personal Blog',
+                                    ])
+                                    ->required(),
+                                TextInput::make('url')
+                                    ->label('Profile URL')
+                                    ->url()
+                                    ->required(),
+                            ]),
+                        ])
+                        ->collapsible()
+                        ->cloneable()
+                        ->defaultItems(0),
                 ]),
         ]);
     }
@@ -108,7 +158,8 @@ class UserResource extends Resource
                 TextColumn::make('name')
                     ->searchable()
                     ->sortable()
-                    ->weight('semibold'),
+                    ->weight('semibold')
+                    ->description(fn (User $record) => $record->job_title),
 
                 TextColumn::make('email')
                     ->searchable()
@@ -118,6 +169,14 @@ class UserResource extends Resource
                     ->label('Role')
                     ->badge()
                     ->separator(','),
+
+                IconColumn::make('is_featured_author')
+                    ->label('Featured Author')
+                    ->boolean()
+                    ->trueIcon('heroicon-s-star')
+                    ->falseIcon('heroicon-o-minus')
+                    ->trueColor('warning')
+                    ->alignCenter(),
 
                 TextColumn::make('posts_count')
                     ->label('Posts')
@@ -141,6 +200,9 @@ class UserResource extends Resource
                     ->relationship('roles', 'name')
                     ->multiple()
                     ->preload(),
+
+                TernaryFilter::make('is_featured_author')
+                    ->label('Featured Authors'),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
@@ -162,9 +224,9 @@ class UserResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index'  => Pages\ListUsers::route('/'),
+            'index' => Pages\ListUsers::route('/'),
             'create' => Pages\CreateUser::route('/create'),
-            'edit'   => Pages\EditUser::route('/{record}/edit'),
+            'edit' => Pages\EditUser::route('/{record}/edit'),
         ];
     }
 

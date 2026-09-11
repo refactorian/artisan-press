@@ -1,0 +1,26 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Support\Facades\DB;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * PostgreSQL requires the notifications.data column to be jsonb (not text)
+     * for the ->> JSON operator used by Filament's database notifications.
+     */
+    public function up(): void
+    {
+        DB::statement('ALTER TABLE notifications ALTER COLUMN data TYPE jsonb USING data::jsonb');
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        DB::statement('ALTER TABLE notifications ALTER COLUMN data TYPE text USING data::text');
+    }
+};

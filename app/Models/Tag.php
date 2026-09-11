@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Spatie\Activitylog\Models\Concerns\LogsActivity;
+use Spatie\Activitylog\Support\LogOptions;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 
@@ -14,11 +16,19 @@ use Spatie\Sluggable\SlugOptions;
 class Tag extends Model
 {
     /** @use HasFactory<TagFactory> */
-    use HasFactory, HasSlug;
+    use HasFactory, HasSlug, LogsActivity;
 
     protected function casts(): array
     {
         return [];
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['name', 'slug'])
+            ->logOnlyDirty()
+            ->dontLogEmptyChanges();
     }
 
     public function getSlugOptions(): SlugOptions
