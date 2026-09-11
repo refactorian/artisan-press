@@ -1,0 +1,350 @@
+<?php
+
+namespace App\Filament\Resources;
+
+use App\Enums\PostStatus;
+use App\Filament\Resources\PostResource\Pages;
+use App\Models\Category;
+use App\Models\Post;
+use App\Models\Tag;
+use App\Models\User;
+use FilamentTiptapEditor\TiptapEditor;
+use Filament\Forms;
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
+use Filament\Forms\Components\TagsInput;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
+use Filament\Resources\Resource;
+use Filament\Tables;
+use Filament\Tables\Actions\BulkAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ForceDeleteBulkAction;
+use Filament\Tables\Actions\RestoreBulkAction;
+use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Str;
+
+class PostResource extends Resource
+{
+    protected static ?string $model = Post::class;
+
+    protected static ?string $navigationIcon = 'heroicon-o-document-text';
+
+    protected static ?string $navigationGroup = 'Content';
+
+    protected static ?int $navigationSort = 1;
+
+    protected static ?string $recordTitleAttribute = 'title';
+
+    public static function form(Form $form): Form
+    {
+        return $form->schema([
+            // ── Left/Main Column ───────────────────────────────────────────────
+            Forms\Components\Grid::make(['default' => 1, 'lg' => 3])->schema([
+
+                Forms\Components\Group::make()->columnSpan(['lg' => 2])->schema([
+
+                    Section::make('Post Content')
+                        ->schema([
+                            TextInput::make('title')
+                                ->label('Title')
+                                ->required()
+                                ->maxLength(255)
+                                ->live(debounce: 500)
+                                ->afterStateUpdated(function (Get $get, Set $set, ?string $old, ?string $state) {
+                                    if (($get('slug') ?? '') !== Str::slug($old ?? '')) {
+                                        return;
+                                    }
+                                    $set('slug', Str::slug($state));
+                                }),
+
+                            TextInput::make('slug')
+                                ->label('Slug')
+                                ->required()
+                                ->maxLength(255)
+                                ->unique(Post::class, 'slug', ignoreRecord: true)
+                                ->helperText('Auto-generated from title. You can override it manually.')
+                                ->prefix('/'),
+
+                            Textarea::make('excerpt')
+                                ->label('Excerpt')
+                                ->rows(3)
+                                ->maxLength(500)
+                                ->helperText('A short summary shown in post listings.'),
+
+                            TiptapEditor::make('content')
+                                ->label('Content')
+                                ->profile('default')
+                                ->required()
+                                ->columnSpanFull(),
+                        ]),
+
+                    Section::make('Featured Image')
+                        ->schema([
+                            SpatieMediaLibraryFileUpload::make('featured_image')
+                                ->label('Featured Image')
+                                ->collection('featured_image')
+                                ->image()
+                                ->imageResizeMode('cover')
+                                ->imageCropAspectRatio('16:9')
+                                ->imageResizeTargetWidth('1200')
+                                ->imageResizeTargetHeight('675')
+                                ->maxSize(5120)
+                                ->helperText('Recommended: 1200×675px (16:9). Max 5MB.'),
+                        ]),
+
+                    Section::make('SEO')
+                        ->collapsed()
+                        ->schema([
+                            TextInput::make('seo_title')
+                                ->label('SEO Title')
+                                ->maxLength(70)
+                                ->helperText('Leave blank to use the post title. Recommended: 50–70 characters.'),
+
+                            Textarea::make('seo_description')
+                                ->label('SEO Description')
+                                ->rows(3)
+                                ->maxLength(160)
+                                ->helperText('Recommended: 120–160 characters.'),
+
+                            TextInput::make('canonical_url')
+                                ->label('Canonical URL')
+                                ->url()
+                                ->maxLength(2048)
+                                ->helperText('Leave blank to use the default post URL.'),
+
+                            Forms\Components\Grid::make(2)->schema([
+                                Toggle::make('noindex')
+                                    ->label('Noindex')
+                                    ->helperText('Exclude from search engine results.'),
+
+                                Toggle::make('nofollow')
+                                    ->label('Nofollow')
+                                    ->helperText('Do not follow links in this post.'),
+                            ]),
+                        ]),
+                ]),
+
+                // ── Right Sidebar ──────────────────────────────────────────────
+                Forms\Components\Group::make()->columnSpan(['lg' => 1])->schema([
+
+                    Section::make('Publishing')
+                        ->schema([
+                            Select::make('status')
+                                ->label('Status')
+                                ->options(PostStatus::class)
+                                ->default(PostStatus::Draft)
+                                ->required()
+                                ->live()
+                                ->native(false),
+
+                            DateTimePicker::make('published_at')
+                                ->label('Publish Date')
+                                ->helperText('Required for scheduled posts. Leave blank to publish immediately.')
+                                ->visible(fn (Get $get) => $get('status') === PostStatus::Scheduled->value || $get('status') === PostStatus::Published->value)
+                                ->native(false),
+
+                            Select::make('user_id')
+                                ->label('Author')
+                                ->relationship('author', 'name')
+                                ->searchable()
+                                ->preload()
+                                ->required()
+                                ->default(fn () => auth()->id()),
+                        ]),
+
+                    Section::make('Taxonomy')
+                        ->schema([
+                            Select::make('categories')
+                                ->label('Categories')
+                                ->relationship('categories', 'name')
+                                ->multiple()
+                                ->searchable()
+                                ->preload()
+                                ->createOptionForm([
+                                    TextInput::make('name')->required()->maxLength(255),
+                                    TextInput::make('slug')->maxLength(255),
+                                ]),
+
+                            Select::make('tags')
+                                ->label('Tags')
+                                ->relationship('tags', 'name')
+                                ->multiple()
+                                ->searchable()
+                                ->preload()
+                                ->createOptionForm([
+                                    TextInput::make('name')->required()->maxLength(255),
+                                    TextInput::make('slug')->maxLength(255),
+                                ]),
+                        ]),
+                ]),
+            ]),
+        ]);
+    }
+
+    public static function table(Table $table): Table
+    {
+        return $table
+            ->columns([
+                SpatieMediaLibraryImageColumn::make('featured_image')
+                    ->label('')
+                    ->collection('featured_image')
+                    ->conversion('thumb')
+                    ->circular(false)
+                    ->width(80)
+                    ->height(50),
+
+                TextColumn::make('title')
+                    ->searchable()
+                    ->sortable()
+                    ->weight('semibold')
+                    ->wrap()
+                    ->description(fn (Post $record): ?string => $record->excerpt ? Str::limit($record->excerpt, 80) : null),
+
+                TextColumn::make('author.name')
+                    ->label('Author')
+                    ->sortable()
+                    ->searchable(),
+
+                TextColumn::make('categories.name')
+                    ->label('Categories')
+                    ->badge()
+                    ->separator(','),
+
+                TextColumn::make('status')
+                    ->label('Status')
+                    ->badge()
+                    ->sortable(),
+
+                TextColumn::make('published_at')
+                    ->label('Published')
+                    ->dateTime('M j, Y')
+                    ->sortable()
+                    ->placeholder('Not published'),
+
+                TextColumn::make('view_count')
+                    ->label('Views')
+                    ->numeric()
+                    ->sortable()
+                    ->alignEnd(),
+
+                TextColumn::make('created_at')
+                    ->label('Created')
+                    ->dateTime('M j, Y')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+            ])
+            ->defaultSort('created_at', 'desc')
+            ->filters([
+                SelectFilter::make('status')
+                    ->options(PostStatus::class),
+
+                SelectFilter::make('user_id')
+                    ->label('Author')
+                    ->relationship('author', 'name')
+                    ->searchable()
+                    ->preload(),
+
+                SelectFilter::make('categories')
+                    ->relationship('categories', 'name')
+                    ->multiple()
+                    ->preload(),
+
+                Filter::make('published_at')
+                    ->label('Published This Month')
+                    ->query(fn (Builder $query) => $query->whereMonth('published_at', now()->month)),
+
+                TrashedFilter::make(),
+            ])
+            ->actions([
+                Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\RestoreAction::make(),
+                Tables\Actions\ForceDeleteAction::make(),
+            ])
+            ->bulkActions([
+                BulkActionGroup::make([
+                    BulkAction::make('publish')
+                        ->label('Publish Selected')
+                        ->icon('heroicon-o-check-circle')
+                        ->color('success')
+                        ->action(function (Collection $records): void {
+                            $records->each(fn (Post $post) => $post->update([
+                                'status'       => PostStatus::Published,
+                                'published_at' => $post->published_at ?? now(),
+                            ]));
+                        })
+                        ->requiresConfirmation()
+                        ->deselectRecordsAfterCompletion(),
+
+                    BulkAction::make('draft')
+                        ->label('Move to Draft')
+                        ->icon('heroicon-o-pencil')
+                        ->color('gray')
+                        ->action(fn (Collection $records) => $records->each->update(['status' => PostStatus::Draft]))
+                        ->requiresConfirmation()
+                        ->deselectRecordsAfterCompletion(),
+
+                    DeleteBulkAction::make(),
+                    RestoreBulkAction::make(),
+                    ForceDeleteBulkAction::make(),
+                ]),
+            ])
+            ->modifyQueryUsing(fn (Builder $query) => $query->withoutGlobalScopes([
+                SoftDeletingScope::class,
+            ]));
+    }
+
+    public static function getRelations(): array
+    {
+        return [];
+    }
+
+    public static function getPages(): array
+    {
+        return [
+            'index'  => Pages\ListPosts::route('/'),
+            'create' => Pages\CreatePost::route('/create'),
+            'edit'   => Pages\EditPost::route('/{record}/edit'),
+        ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->withoutGlobalScopes([
+                SoftDeletingScope::class,
+            ]);
+    }
+
+    public static function getNavigationBadge(): ?string
+    {
+        return (string) static::getModel()::where('status', PostStatus::Draft)->count();
+    }
+
+    public static function getNavigationBadgeColor(): string|array|null
+    {
+        return 'warning';
+    }
+
+    public static function getNavigationBadgeTooltip(): ?string
+    {
+        return 'Draft posts';
+    }
+}
