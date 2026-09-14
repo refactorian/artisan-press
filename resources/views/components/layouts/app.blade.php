@@ -23,6 +23,9 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
 </head>
+<!-- Skip to main content (accessibility) -->
+<a href="#main-content" class="skip-to-content">Skip to main content</a>
+
 <body
     id="top"
     x-data="{
@@ -48,7 +51,7 @@
     <x-mobile-menu />
 
     <!-- Main Page Content Slot -->
-    <main class="flex-1">
+    <main class="flex-1" id="main-content">
         {{ $slot }}
     </main>
 
@@ -66,6 +69,31 @@
 
     <!-- Global Helpers Script -->
     <script>
+        // Keyboard shortcut: Cmd/Ctrl+K opens search
+        document.addEventListener('keydown', function(e) {
+            if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+                e.preventDefault();
+                window.dispatchEvent(new CustomEvent('open-quick-search'));
+            }
+        });
+
+        // Recently viewed posts tracker (localStorage)
+        window.$recentlyViewed = {
+            MAX: 8,
+            key: 'recently_viewed_posts',
+            get() {
+                try { return JSON.parse(localStorage.getItem(this.key) || '[]'); } catch(e) { return []; }
+            },
+            add(post) {
+                try {
+                    let list = this.get().filter(p => p.slug !== post.slug);
+                    list.unshift(post);
+                    if (list.length > this.MAX) list = list.slice(0, this.MAX);
+                    localStorage.setItem(this.key, JSON.stringify(list));
+                } catch(e) {}
+            }
+        };
+
         window.$bookmarks = {
             isSaved(slug) {
                 try {

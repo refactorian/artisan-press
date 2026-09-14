@@ -16,6 +16,47 @@ class SeoService
      *
      * @return array<string, mixed>
      */
+    /**
+     * Generate a BreadcrumbList schema from a breadcrumbs array.
+     *
+     * @param  array<int, array{label: string, url?: string}>  $breadcrumbs
+     * @return array<string, mixed>
+     */
+    public function generateBreadcrumbSchema(array $breadcrumbs, string $homeUrl = ''): array
+    {
+        $items = [];
+        $position = 1;
+
+        // Always prepend home
+        $items[] = [
+            '@type' => 'ListItem',
+            'position' => $position++,
+            'name' => 'Home',
+            'item' => $homeUrl ?: url('/'),
+        ];
+
+        foreach ($breadcrumbs as $crumb) {
+            if (empty($crumb['label'])) {
+                continue;
+            }
+            $item = [
+                '@type' => 'ListItem',
+                'position' => $position++,
+                'name' => $crumb['label'],
+            ];
+            if (! empty($crumb['url'])) {
+                $item['item'] = $crumb['url'];
+            }
+            $items[] = $item;
+        }
+
+        return [
+            '@context' => 'https://schema.org',
+            '@type' => 'BreadcrumbList',
+            'itemListElement' => $items,
+        ];
+    }
+
     public function generate(Post|Page|Category|Tag|User|null $model = null): array
     {
         $siteName = Setting::get('site_name', config('app.name', 'Laravel Modern Blog'));
@@ -47,10 +88,20 @@ class SeoService
                     'image' => asset('images/og-default.png'),
                 ],
                 'schema' => [
-                    '@context' => 'https://schema.org',
-                    '@type' => 'WebSite',
-                    'name' => $siteName,
-                    'url' => $siteUrl,
+                    [
+                        '@context' => 'https://schema.org',
+                        '@type' => 'WebSite',
+                        'name' => $siteName,
+                        'url' => $siteUrl,
+                        'potentialAction' => [
+                            '@type' => 'SearchAction',
+                            'target' => [
+                                '@type' => 'EntryPoint',
+                                'urlTemplate' => url('/search').'?q={search_term_string}',
+                            ],
+                            'query-input' => 'required name=search_term_string',
+                        ],
+                    ],
                 ],
             ];
         }
@@ -84,7 +135,25 @@ class SeoService
         $imageUrl = $post->getFirstMediaUrl('featured_image', 'og')
             ?: ($post->getFirstMediaUrl('featured_image') ?: asset('images/og-default.png'));
 
-        $schema = [
+        $wordCount = str_word_count(strip_tags($post->content ?? ''));
+        $keywords = $post->tags->pluck('name')->merge($post->categories->pluck('name'))->filter()->implode(', ');
+
+        $authorSchema = [
+            '@type' => 'Person',
+            'name' => $post->author?->name ?? 'Editorial Staff',
+            'url' => $post->author ? url("/authors/{$post->author->id}") : null,
+        ];
+        if ($post->author?->job_title) {
+            $authorSchema['jobTitle'] = $post->author->job_title;
+        }
+        if ($post->author?->twitter_handle) {
+            $authorSchema['sameAs'][] = "https://twitter.com/{$post->author->twitter_handle}";
+        }
+        if ($post->author?->linkedin_url) {
+            $authorSchema['sameAs'][] = $post->author->linkedin_url;
+        }
+
+        $articleSchema = [
             '@context' => 'https://schema.org',
             '@type' => 'BlogPosting',
             'mainEntityOfPage' => [
@@ -96,17 +165,17 @@ class SeoService
             'image' => $imageUrl,
             'datePublished' => $post->published_at?->toIso8601String(),
             'dateModified' => $post->updated_at?->toIso8601String(),
-            'author' => [
-                '@type' => 'Person',
-                'name' => $post->author?->name ?? 'Editorial Staff',
-                'url' => $post->author ? url("/authors/{$post->author->id}") : null,
-            ],
+            'wordCount' => $wordCount,
+            'keywords' => $keywords ?: null,
+            'author' => $authorSchema,
             'publisher' => [
                 '@type' => 'Organization',
                 'name' => $siteName,
                 'url' => url('/'),
             ],
         ];
+
+        $schema = [$articleSchema];
 
         return [
             'title' => "{$title} | {$siteName}",
@@ -131,7 +200,7 @@ class SeoService
             'twitter' => [
                 'card' => 'summary_large_image',
                 'site' => $twitterHandle,
-                'creator' => $post->author?->website_url ?? $twitterHandle,
+                'creator' => $post->author?->twitter_handle ? '@'.$post->author->twitter_handle : $twitterHandle,
                 'title' => $title,
                 'description' => (string) $description,
                 'image' => $imageUrl,
@@ -310,12 +379,21 @@ class SeoService
                 'description' => (string) $description,
             ],
             'schema' => [
-                '@context' => 'https://schema.org',
-                '@type' => 'Person',
-                'name' => $author->name,
-                'url' => $canonicalUrl,
-                'jobTitle' => $author->job_title,
-                'description' => $author->bio,
+                [
+                    '@context' => 'https://schema.org',
+                    '@type' => 'Person',
+                    'name' => $author->name,
+                    'url' => $canonicalUrl,
+                    'jobTitle' => $author->job_title,
+                    'description' => $author->bio,
+                    'image' => $author->getFilamentAvatarUrl() ?: null,
+                    'sameAs' => array_values(array_filter([
+                        $author->twitter_handle ? "https://twitter.com/{$author->twitter_handle}" : null,
+                        $author->linkedin_url ?? null,
+                        $author->github_username ? "https://github.com/{$author->github_username}" : null,
+                        $author->website_url ?? null,
+                    ])),
+                ],
             ],
         ];
     }

@@ -24,11 +24,26 @@ class TagController extends Controller
             ['label' => '#'.$tag->name],
         ];
 
+        // Related tags: other tags appearing on the same posts
+        $relatedTags = Tag::whereHas('posts', function ($q) use ($tag): void {
+            $q->published()->whereHas('tags', function ($inner) use ($tag): void {
+                $inner->where('tags.id', $tag->id);
+            });
+        })
+            ->where('id', '!=', $tag->id)
+            ->withCount(['posts' => function ($q): void {
+                $q->published();
+            }])
+            ->orderByDesc('posts_count')
+            ->limit(16)
+            ->get();
+
         return view('pages.tags.show', [
             'tag' => $tag,
             'posts' => $posts,
             'metadata' => $metadata,
             'breadcrumbs' => $breadcrumbs,
+            'relatedTags' => $relatedTags,
         ]);
     }
 }

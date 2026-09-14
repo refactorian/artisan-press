@@ -101,6 +101,23 @@ class PostComments extends Component
         $this->dispatch('toast', message: $msg, type: 'success');
     }
 
+    public function placeholder(): string
+    {
+        return <<<'HTML'
+        <div class="space-y-6 animate-pulse p-6 sm:p-8 rounded-2xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800">
+            <div class="flex items-center justify-between pb-4 border-b border-zinc-200/80 dark:border-zinc-800">
+                <div class="h-6 w-36 bg-zinc-200 dark:bg-zinc-800 rounded"></div>
+                <div class="h-4 w-20 bg-zinc-200 dark:bg-zinc-800 rounded"></div>
+            </div>
+            <div class="h-24 bg-zinc-200 dark:bg-zinc-800 rounded-xl"></div>
+            <div class="space-y-3 pt-4">
+                <div class="h-4 w-48 bg-zinc-200 dark:bg-zinc-800 rounded"></div>
+                <div class="h-16 bg-zinc-200 dark:bg-zinc-800 rounded-xl"></div>
+            </div>
+        </div>
+        HTML;
+    }
+
     public function render(): View
     {
         $commentsEnabled = (bool) Setting::get('enable_comments', true);

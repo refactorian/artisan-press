@@ -5,7 +5,9 @@
 ])
 
 @php
-    $imageUrl = $post->getFirstMediaUrl('featured_image', 'medium') ?: $post->getFirstMediaUrl('featured_image');
+    $imageUrl = $post->getFirstMediaUrl('featured_image', 'thumbnail')
+        ?: $post->getFirstMediaUrl('featured_image', 'medium')
+        ?: $post->getFirstMediaUrl('featured_image');
     $category = $post->categories->first();
     $author = $post->author;
     $readingTime = $post->reading_time ?: ($post->calculateReadingTime() ?? 3);
@@ -16,7 +18,7 @@
         <!-- Thumbnail -->
         <a href="{{ route('posts.show', $post) }}" class="relative sm:w-64 sm:h-48 h-52 flex-shrink-0 overflow-hidden rounded-xl bg-gradient-to-br from-indigo-500/10 via-purple-500/10 to-pink-500/10 dark:from-indigo-950/40 dark:to-purple-950/40">
             @if($imageUrl)
-                <img src="{{ $imageUrl }}" alt="{{ $post->title }}" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" loading="lazy">
+                <img src="{{ $imageUrl }}" alt="{{ $post->title }}" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" loading="lazy" decoding="async">
             @else
                 <div class="w-full h-full flex flex-col items-center justify-center p-4 text-center bg-gradient-to-tr from-slate-100 via-indigo-50/50 to-slate-200 dark:from-zinc-800 dark:via-indigo-950/30 dark:to-zinc-850">
                     <span class="text-3xl font-extrabold text-indigo-600/30 dark:text-indigo-400/20 uppercase tracking-wider">

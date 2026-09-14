@@ -46,5 +46,26 @@
                 actionUrl="{{ route('posts.index') }}"
             />
         @endif
+
+        @if(isset($otherCategories) && $otherCategories->isNotEmpty())
+            <div class="mt-16 pt-10 border-t border-zinc-200/80 dark:border-zinc-800">
+                <h3 class="text-xs font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 mb-4">
+                    Explore Other Topics
+                </h3>
+                <div class="flex flex-wrap gap-2.5">
+                    @foreach($otherCategories as $otherCat)
+                        <a
+                            href="{{ route('categories.show', $otherCat) }}"
+                            class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 hover:border-indigo-500/40 text-xs font-semibold text-zinc-800 dark:text-zinc-200 transition-all shadow-sm"
+                        >
+                            <span>{{ $otherCat->name }}</span>
+                            <span class="px-1.5 py-0.5 rounded-full text-[10px] bg-zinc-200 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400">
+                                {{ $otherCat->posts_count }}
+                            </span>
+                        </a>
+                    @endforeach
+                </div>
+            </div>
+        @endif
     </div>
 </x-layouts.app>

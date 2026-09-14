@@ -119,6 +119,14 @@ class PostController extends Controller
 
         $breadcrumbs[] = ['label' => $post->title];
 
+        // Enrich schema with BreadcrumbList
+        $breadcrumbSchema = $seoService->generateBreadcrumbSchema($breadcrumbs);
+        if (isset($metadata['schema'])) {
+            $metadata['schema'] = [$metadata['schema'], $breadcrumbSchema];
+        } else {
+            $metadata['schema'] = [$breadcrumbSchema];
+        }
+
         return view('pages.posts.show', [
             'post' => $post,
             'metadata' => $metadata,

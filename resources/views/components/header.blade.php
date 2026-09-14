@@ -32,7 +32,7 @@
             </a>
 
             <!-- Desktop Navigation -->
-            <nav class="hidden md:flex items-center gap-1">
+            <nav class="hidden md:flex items-center gap-1" role="navigation" aria-label="Main">
                 @foreach($menuItems as $item)
                     @php
                         $hasChildren = !empty($item->children) && count($item->children) > 0;
@@ -40,10 +40,12 @@
                     @endphp
 
                     @if($hasChildren)
-                        <div class="relative" x-data="{ open: false }" @click.outside="open = false">
+                        <div class="relative" x-data="{ open: false }" @click.outside="open = false" @keydown.escape.window="open = false">
                             <button
                                 type="button"
                                 @click="open = !open"
+                                :aria-expanded="open"
+                                aria-haspopup="true"
                                 class="flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-850 cursor-pointer"
                             >
                                 <span>{{ $item->label }}</span>

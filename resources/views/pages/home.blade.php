@@ -156,7 +156,7 @@
                                 Join over thousands of developers getting high-signal engineering patterns.
                             </p>
                             <div class="pt-2">
-                                <livewire:newsletter-form source="sidebar" />
+                                <livewire:newsletter-form source="sidebar" lazy />
                             </div>
                         </div>
                     </div>

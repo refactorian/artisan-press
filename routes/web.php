@@ -39,6 +39,13 @@ Route::prefix('feed')->group(function (): void {
     Route::get('/tag/{slug}', [FeedController::class, 'tag'])->name('feed.tag');
 });
 
+// Robots.txt
+Route::get('/robots.txt', function () {
+    $content = "User-agent: *\nAllow: /\nDisallow: /admin\nDisallow: /livewire\n\n# Sitemap\nSitemap: ".route('sitemap');
+
+    return response($content, 200, ['Content-Type' => 'text/plain']);
+})->name('robots');
+
 // Dynamic Pages (About, Contact, Privacy, etc.)
 Route::get('/{page:slug}', [PageController::class, 'show'])
     ->where('page', '[a-zA-Z0-9\-_]+')

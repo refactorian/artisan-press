@@ -28,11 +28,21 @@ class CategoryController extends Controller
             ['label' => $category->name],
         ];
 
+        $otherCategories = Category::active()
+            ->where('id', '!=', $category->id)
+            ->withCount(['posts' => function ($q): void {
+                $q->published();
+            }])
+            ->orderByDesc('posts_count')
+            ->limit(8)
+            ->get();
+
         return view('pages.categories.show', [
             'category' => $category,
             'posts' => $posts,
             'metadata' => $metadata,
             'breadcrumbs' => $breadcrumbs,
+            'otherCategories' => $otherCategories,
         ]);
     }
 }

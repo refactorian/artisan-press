@@ -52,6 +52,16 @@ class NewsletterForm extends Component
         $this->email = '';
     }
 
+    public function placeholder(): string
+    {
+        return <<<'HTML'
+        <div class="animate-pulse space-y-2">
+            <div class="h-10 bg-white/10 rounded-xl"></div>
+            <div class="h-3 w-32 bg-white/10 rounded"></div>
+        </div>
+        HTML;
+    }
+
     public function render(): View
     {
         return view('livewire.newsletter-form');

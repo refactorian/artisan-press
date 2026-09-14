@@ -8,12 +8,9 @@ use App\Models\Tag;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Url;
 use Livewire\Component;
-use Livewire\WithPagination;
 
 class PostListing extends Component
 {
-    use WithPagination;
-
     #[Url(as: 'q', except: '')]
     public string $search = '';
 
@@ -30,24 +27,31 @@ class PostListing extends Component
 
     public int $perPage = 9;
 
+    public int $page = 1;
+
+    public bool $hasMore = false;
+
+    /** @var array<int, mixed> */
+    public array $loadedIds = [];
+
     public function updatingSearch(): void
     {
-        $this->resetPage();
+        $this->resetListing();
     }
 
     public function updatingSelectedCategory(): void
     {
-        $this->resetPage();
+        $this->resetListing();
     }
 
     public function updatingSelectedTag(): void
     {
-        $this->resetPage();
+        $this->resetListing();
     }
 
     public function updatingSort(): void
     {
-        $this->resetPage();
+        $this->resetListing();
     }
 
     public function clearFilters(): void
@@ -56,7 +60,7 @@ class PostListing extends Component
         $this->selectedCategory = '';
         $this->selectedTag = '';
         $this->sort = 'latest';
-        $this->resetPage();
+        $this->resetListing();
     }
 
     public function setViewMode(string $mode): void
@@ -64,6 +68,18 @@ class PostListing extends Component
         if (in_array($mode, ['grid', 'list'], true)) {
             $this->viewMode = $mode;
         }
+    }
+
+    public function loadMore(): void
+    {
+        $this->page++;
+    }
+
+    private function resetListing(): void
+    {
+        $this->page = 1;
+        $this->loadedIds = [];
+        $this->hasMore = false;
     }
 
     public function render(): View
@@ -105,7 +121,9 @@ class PostListing extends Component
             default => $query->orderBy('published_at', 'desc'),
         };
 
-        $posts = $query->paginate($this->perPage);
+        $totalCount = $query->count();
+        $posts = $query->paginate($this->perPage * $this->page);
+        $this->hasMore = $posts->hasMorePages();
 
         $categories = Category::active()
             ->whereHas('posts', function ($q): void {
@@ -129,6 +147,7 @@ class PostListing extends Component
 
         return view('livewire.post-listing', [
             'posts' => $posts,
+            'totalCount' => $totalCount,
             'categories' => $categories,
             'tags' => $tags,
         ]);

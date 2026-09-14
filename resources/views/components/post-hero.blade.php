@@ -11,7 +11,7 @@
     <!-- Background Image or Decorative Gradient -->
     <div class="absolute inset-0">
         @if($imageUrl)
-            <img src="{{ $imageUrl }}" alt="{{ $post->title }}" class="w-full h-full object-cover opacity-35 group-hover:scale-105 transition-transform duration-700 ease-out">
+            <img src="{{ $imageUrl }}" alt="{{ $post->title }}" loading="eager" fetchpriority="high" decoding="async" class="w-full h-full object-cover opacity-35 group-hover:scale-105 transition-transform duration-700 ease-out">
         @else
             <div class="w-full h-full bg-gradient-to-br from-indigo-950 via-zinc-900 to-slate-900 opacity-90"></div>
         @endif

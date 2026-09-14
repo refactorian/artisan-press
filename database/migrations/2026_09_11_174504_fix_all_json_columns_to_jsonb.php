@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -18,19 +19,25 @@ return new class extends Migration
     public function up(): void
     {
         $conversions = [
-            'activity_log'   => ['properties', 'attribute_changes'],
-            'media'          => ['custom_properties', 'generated_conversions', 'manipulations', 'responsive_images'],
-            'pages'          => ['content_blocks'],
+            'activity_log' => ['properties', 'attribute_changes'],
+            'media' => ['custom_properties', 'generated_conversions', 'manipulations', 'responsive_images'],
+            'pages' => ['content_blocks'],
             'post_revisions' => ['content_blocks'],
-            'posts'          => ['content_blocks'],
-            'users'          => ['social_links'],
+            'posts' => ['content_blocks'],
+            'users' => ['social_links'],
         ];
 
         foreach ($conversions as $table => $columns) {
+            if (! Schema::hasTable($table)) {
+                continue;
+            }
+
             foreach ($columns as $column) {
-                DB::statement(
-                    "ALTER TABLE \"{$table}\" ALTER COLUMN \"{$column}\" TYPE jsonb USING \"{$column}\"::jsonb"
-                );
+                if (Schema::hasColumn($table, $column)) {
+                    DB::statement(
+                        "ALTER TABLE \"{$table}\" ALTER COLUMN \"{$column}\" TYPE jsonb USING \"{$column}\"::jsonb"
+                    );
+                }
             }
         }
     }
@@ -41,12 +48,12 @@ return new class extends Migration
     public function down(): void
     {
         $conversions = [
-            'activity_log'   => ['properties', 'attribute_changes'],
-            'media'          => ['custom_properties', 'generated_conversions', 'manipulations', 'responsive_images'],
-            'pages'          => ['content_blocks'],
+            'activity_log' => ['properties', 'attribute_changes'],
+            'media' => ['custom_properties', 'generated_conversions', 'manipulations', 'responsive_images'],
+            'pages' => ['content_blocks'],
             'post_revisions' => ['content_blocks'],
-            'posts'          => ['content_blocks'],
-            'users'          => ['social_links'],
+            'posts' => ['content_blocks'],
+            'users' => ['social_links'],
         ];
 
         foreach ($conversions as $table => $columns) {
