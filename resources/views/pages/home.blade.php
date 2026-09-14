@@ -23,7 +23,7 @@
                     @foreach($categories as $category)
                         <a
                             href="{{ route('categories.show', $category) }}"
-                            class="group inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 hover:border-indigo-500/40 dark:hover:border-indigo-400/40 hover:bg-white dark:hover:bg-zinc-850 transition-all text-xs font-semibold text-zinc-800 dark:text-zinc-200 shadow-sm"
+                            class="group inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 hover:border-indigo-500/40 dark:hover:border-indigo-400/40 hover:bg-white dark:hover:bg-zinc-800 transition-all text-xs font-semibold text-zinc-800 dark:text-zinc-200 shadow-sm"
                         >
                             <span>{{ $category->name }}</span>
                             <span class="px-1.5 py-0.5 rounded-full text-[10px] bg-zinc-200/70 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 group-hover:bg-indigo-100 dark:group-hover:bg-indigo-950 group-hover:text-indigo-600 dark:group-hover:text-indigo-300 transition-colors">
@@ -85,7 +85,7 @@
                         <div class="mt-10 text-center">
                             <a
                                 href="{{ route('posts.index') }}"
-                                class="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 text-sm font-semibold hover:bg-zinc-800 dark:hover:bg-white transition-all shadow-md"
+                                class="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-zinc-900 dark:bg-zinc-800 text-white dark:text-zinc-100 text-sm font-semibold hover:bg-zinc-800 dark:hover:bg-zinc-700 border border-zinc-900 dark:border-zinc-700 transition-all shadow-md cursor-pointer"
                             >
                                 <span>Browse complete archive</span>
                                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">

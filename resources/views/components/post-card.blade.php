@@ -20,7 +20,7 @@
             @if($imageUrl)
                 <img src="{{ $imageUrl }}" alt="{{ $post->title }}" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" loading="lazy" decoding="async">
             @else
-                <div class="w-full h-full flex flex-col items-center justify-center p-4 text-center bg-gradient-to-tr from-slate-100 via-indigo-50/50 to-slate-200 dark:from-zinc-800 dark:via-indigo-950/30 dark:to-zinc-850">
+                <div class="w-full h-full flex flex-col items-center justify-center p-4 text-center bg-gradient-to-tr from-slate-100 via-indigo-50/50 to-slate-200 dark:from-zinc-800 dark:via-indigo-950/30 dark:to-zinc-900">
                     <span class="text-3xl font-extrabold text-indigo-600/30 dark:text-indigo-400/20 uppercase tracking-wider">
                         {{ substr($category?->name ?? 'Blog', 0, 3) }}
                     </span>
@@ -131,7 +131,7 @@
             @if($imageUrl)
                 <img src="{{ $imageUrl }}" alt="{{ $post->title }}" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" loading="lazy">
             @else
-                <div class="w-full h-full flex flex-col items-center justify-center p-6 text-center bg-gradient-to-tr from-slate-100 via-indigo-50/60 to-slate-200 dark:from-zinc-800 dark:via-indigo-950/40 dark:to-zinc-850">
+                <div class="w-full h-full flex flex-col items-center justify-center p-6 text-center bg-gradient-to-tr from-slate-100 via-indigo-50/60 to-slate-200 dark:from-zinc-800 dark:via-indigo-950/40 dark:to-zinc-900">
                     <span class="text-4xl font-black text-indigo-600/20 dark:text-indigo-400/20 tracking-wider">
                         {{ substr($category?->name ?? 'Blog', 0, 3) }}
                     </span>

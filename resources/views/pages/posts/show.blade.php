@@ -208,7 +208,7 @@
                                 <button
                                     type="button"
                                     @click="toggleBookmark()"
-                                    class="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-850 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-semibold transition-all cursor-pointer shadow-sm"
+                                    class="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 text-xs font-semibold transition-all cursor-pointer shadow-sm"
                                     :title="saved ? 'Remove from saved' : 'Save article'"
                                 >
                                     <svg class="w-4 h-4" :class="{ 'text-indigo-600 dark:text-indigo-400': saved }" :fill="saved ? 'currentColor' : 'none'" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
@@ -222,10 +222,10 @@
                                     <button
                                         type="button"
                                         @click="if (navigator.share) { navigator.share({ title: @js($post->title), url: window.location.href }).catch(() => {}); } else { shareOpen = !shareOpen; }"
-                                        class="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-850 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-semibold transition-all cursor-pointer shadow-sm"
+                                        class="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 text-xs font-semibold transition-all cursor-pointer shadow-sm"
                                         aria-label="Share article"
                                     >
-                                        <svg class="w-4 h-4 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                        <svg class="w-4 h-4 text-zinc-500 dark:text-zinc-400" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z" />
                                         </svg>
                                         <span>Share</span>
@@ -378,7 +378,7 @@
                             </h4>
                             <div class="flex flex-wrap gap-2">
                                 @foreach($post->tags as $tag)
-                                    <a href="{{ route('tags.show', $tag) }}" class="inline-flex items-center px-3 py-1 rounded-lg bg-zinc-100 dark:bg-zinc-850 hover:bg-indigo-50 dark:hover:bg-indigo-950 text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
+                                    <a href="{{ route('tags.show', $tag) }}" class="inline-flex items-center px-3 py-1 rounded-lg bg-zinc-100 dark:bg-zinc-800 hover:bg-indigo-50 dark:hover:bg-indigo-950 text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
                                         #{{ $tag->name }}
                                     </a>
                                 @endforeach
@@ -526,7 +526,7 @@
                             <button
                                 type="button"
                                 @click="toggleBookmark()"
-                                class="flex-1 inline-flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-850 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 font-semibold transition-all cursor-pointer shadow-sm"
+                                class="flex-1 inline-flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 font-semibold transition-all cursor-pointer shadow-sm"
                             >
                                 <svg class="w-4 h-4" :class="{ 'text-indigo-600 dark:text-indigo-400': saved }" :fill="saved ? 'currentColor' : 'none'" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
@@ -536,7 +536,7 @@
                             <button
                                 type="button"
                                 @click="if (navigator.share) { navigator.share({ title: @js($post->title), url: window.location.href }).catch(() => {}); } else { navigator.clipboard.writeText(window.location.href); $dispatch('toast', { message: 'Link copied!', type: 'success' }); }"
-                                class="inline-flex items-center justify-center p-2 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-850 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 transition-all cursor-pointer shadow-sm"
+                                class="inline-flex items-center justify-center p-2 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 transition-all cursor-pointer shadow-sm"
                                 title="Share or Copy Link"
                             >
                                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">

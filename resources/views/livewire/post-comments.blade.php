@@ -27,7 +27,7 @@
 
             <form wire:submit="submitComment" class="space-y-4">
                 @if(auth()->check())
-                    <div class="flex items-center gap-3 p-3 rounded-xl bg-white dark:bg-zinc-850 border border-zinc-200 dark:border-zinc-800 text-xs">
+                    <div class="flex items-center gap-3 p-3 rounded-xl bg-white dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 text-xs">
                         <div class="w-7 h-7 rounded-full bg-indigo-600 text-white font-bold flex items-center justify-center text-xs">
                             {{ substr(auth()->user()->name, 0, 1) }}
                         </div>
@@ -47,7 +47,7 @@
                                 type="text"
                                 wire:model="guestName"
                                 placeholder="e.g. Jane Doe"
-                                class="w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-zinc-850 border border-zinc-300 dark:border-zinc-700 text-xs text-zinc-900 dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                class="w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 text-xs text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors"
                             >
                             @error('guestName') <span class="text-[11px] text-rose-500 mt-1 block">{{ $message }}</span> @enderror
                         </div>
@@ -58,7 +58,7 @@
                                 type="email"
                                 wire:model="guestEmail"
                                 placeholder="jane@example.com"
-                                class="w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-zinc-850 border border-zinc-300 dark:border-zinc-700 text-xs text-zinc-900 dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                class="w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 text-xs text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors"
                             >
                             @error('guestEmail') <span class="text-[11px] text-rose-500 mt-1 block">{{ $message }}</span> @enderror
                         </div>
@@ -71,18 +71,18 @@
                         wire:model="content"
                         rows="4"
                         placeholder="Write constructive remarks, questions, or architectural suggestions..."
-                        class="w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-zinc-850 border border-zinc-300 dark:border-zinc-700 text-xs sm:text-sm text-zinc-900 dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 leading-relaxed resize-y"
+                        class="w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 text-xs sm:text-sm text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 leading-relaxed resize-y transition-colors"
                     ></textarea>
                     @error('content') <span class="text-[11px] text-rose-500 mt-1 block">{{ $message }}</span> @enderror
                 </div>
 
                 <div class="flex items-center justify-between pt-1">
-                    <p class="text-[11px] text-zinc-500">Markdown syntax supported. Be kind and constructive.</p>
+                    <p class="text-[11px] text-zinc-500 dark:text-zinc-400">Markdown syntax supported. Be kind and constructive.</p>
 
                     <button
                         type="submit"
                         wire:loading.attr="disabled"
-                        class="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all shadow-md cursor-pointer disabled:opacity-50"
+                        class="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition-all shadow-md shadow-indigo-600/20 cursor-pointer disabled:opacity-50"
                     >
                         <span wire:loading.remove>Post Comment</span>
                         <span wire:loading class="flex items-center gap-2">
@@ -97,7 +97,7 @@
             </form>
         </div>
     @else
-        <div class="p-4 rounded-xl bg-zinc-100 dark:bg-zinc-850 text-xs text-zinc-500 dark:text-zinc-400 text-center">
+        <div class="p-4 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-xs text-zinc-500 dark:text-zinc-400 text-center">
             Comments are currently disabled for this article.
         </div>
     @endif
@@ -157,7 +157,7 @@
                 @if($comment->replies->isNotEmpty())
                     <div class="mt-4 pt-4 border-t border-zinc-100 dark:border-zinc-800/80 pl-6 sm:pl-10 space-y-4">
                         @foreach($comment->replies as $reply)
-                            <div class="p-4 rounded-xl bg-zinc-50 dark:bg-zinc-850/60 border border-zinc-200/60 dark:border-zinc-800/60 space-y-2">
+                            <div class="p-4 rounded-xl bg-zinc-100/70 dark:bg-zinc-800/60 border border-zinc-200/60 dark:border-zinc-700/60 space-y-2">
                                 <div class="flex items-center justify-between">
                                     <div class="flex items-center gap-2">
                                         <div class="w-6 h-6 rounded-full bg-purple-600 text-white font-bold flex items-center justify-center text-[10px]">

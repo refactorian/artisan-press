@@ -17,7 +17,13 @@ class DatabaseSeeder extends Seeder
         $this->call([
             RolesAndPermissionsSeeder::class,
             AdminUserSeeder::class,
-            Phase2Seeder::class,
+            AuthorSeeder::class,
+            TaxonomySeeder::class,
+            SeriesSeeder::class,
+            PostSeeder::class,
+            CommentSeeder::class,
+            PageAndNavigationSeeder::class,
+            SettingSeeder::class,
         ]);
     }
 }

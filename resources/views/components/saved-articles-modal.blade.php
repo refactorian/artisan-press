@@ -130,7 +130,7 @@
                     <button
                         type="button"
                         @click="isOpen = false"
-                        class="px-4 py-2 rounded-xl bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 text-xs font-bold"
+                        class="px-4 py-2 rounded-xl bg-zinc-900 dark:bg-zinc-800 hover:bg-zinc-800 dark:hover:bg-zinc-700 text-white text-xs font-bold border border-zinc-900 dark:border-zinc-700 transition-colors cursor-pointer"
                     >
                         Done
                     </button>

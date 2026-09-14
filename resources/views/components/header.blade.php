@@ -46,7 +46,7 @@
                                 @click="open = !open"
                                 :aria-expanded="open"
                                 aria-haspopup="true"
-                                class="flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-850 cursor-pointer"
+                                class="flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer"
                             >
                                 <span>{{ $item->label }}</span>
                                 <svg class="w-3.5 h-3.5 transition-transform" :class="{ 'rotate-180': open }" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
@@ -77,7 +77,7 @@
                     @else
                         <a
                             href="{{ $item->url }}"
-                            class="px-3 py-1.5 rounded-lg text-sm font-medium transition-colors {{ $isActive ? 'text-indigo-600 dark:text-indigo-400 bg-indigo-50/70 dark:bg-indigo-950/50' : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-850' }}"
+                            class="px-3 py-1.5 rounded-lg text-sm font-medium transition-colors {{ $isActive ? 'text-indigo-600 dark:text-indigo-400 bg-indigo-50/70 dark:bg-indigo-950/50' : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800' }}"
                         >
                             {{ $item->label }}
                         </a>

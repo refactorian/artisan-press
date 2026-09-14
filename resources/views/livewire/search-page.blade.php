@@ -61,7 +61,7 @@
                 <button
                     type="button"
                     wire:click="$set('selectedCategory', '')"
-                    class="px-3 py-1 rounded-full font-semibold transition-colors cursor-pointer {{ $selectedCategory === '' ? 'bg-indigo-600 text-white' : 'bg-white dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700' }}"
+                    class="px-3 py-1 rounded-full font-semibold transition-colors cursor-pointer {{ $selectedCategory === '' ? 'bg-indigo-600 text-white' : 'bg-white dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-700' }}"
                 >
                     All Categories
                 </button>
@@ -69,7 +69,7 @@
                     <button
                         type="button"
                         wire:click="$set('selectedCategory', '{{ $category->slug }}')"
-                        class="px-3 py-1 rounded-full font-semibold transition-colors cursor-pointer {{ $selectedCategory === $category->slug ? 'bg-indigo-600 text-white' : 'bg-white dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700' }}"
+                        class="px-3 py-1 rounded-full font-semibold transition-colors cursor-pointer {{ $selectedCategory === $category->slug ? 'bg-indigo-600 text-white' : 'bg-white dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-700' }}"
                     >
                         {{ $category->name }}
                     </button>
@@ -81,7 +81,7 @@
                         <button
                             type="button"
                             wire:click="$set('selectedTag', '{{ $selectedTag === $tag->slug ? '' : $tag->slug }}')"
-                            class="px-2.5 py-1 rounded-lg font-medium text-[11px] transition-colors cursor-pointer {{ $selectedTag === $tag->slug ? 'bg-indigo-600 text-white' : 'bg-zinc-200/70 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400' }}"
+                            class="px-2.5 py-1 rounded-lg font-medium text-[11px] transition-colors cursor-pointer {{ $selectedTag === $tag->slug ? 'bg-indigo-600 text-white' : 'bg-zinc-200/70 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-300 dark:hover:bg-zinc-700' }}"
                         >
                             #{{ $tag->name }}
                         </button>
@@ -150,7 +150,7 @@
                             @if($imageUrl)
                                 <img src="{{ $imageUrl }}" alt="{{ $post->title }}" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" loading="lazy">
                             @else
-                                <div class="w-full h-full flex flex-col items-center justify-center p-6 text-center bg-gradient-to-tr from-slate-100 to-indigo-50 dark:from-zinc-800 dark:to-zinc-850">
+                                <div class="w-full h-full flex flex-col items-center justify-center p-6 text-center bg-gradient-to-tr from-slate-100 to-indigo-50 dark:from-zinc-800 dark:to-zinc-900">
                                     <span class="text-3xl font-black text-indigo-600/20 dark:text-indigo-400/20">
                                         {{ substr($category?->name ?? 'Article', 0, 3) }}
                                     </span>

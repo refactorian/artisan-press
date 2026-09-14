@@ -76,7 +76,7 @@
             @if(strlen(trim($query)) >= 2)
                 <div class="max-h-96 overflow-y-auto p-2">
                     @if($results->isNotEmpty())
-                        <ul class="divide-y divide-zinc-100 dark:divide-zinc-850">
+                        <ul class="divide-y divide-zinc-100 dark:divide-zinc-800">
                             @foreach($results as $item)
                                 <li>
                                     <a

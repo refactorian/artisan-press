@@ -141,7 +141,7 @@
                     wire:click="loadMore"
                     wire:loading.attr="disabled"
                     wire:target="loadMore"
-                    class="inline-flex items-center justify-center gap-2.5 px-8 py-3.5 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:border-indigo-400 dark:hover:border-indigo-500 text-sm font-semibold text-zinc-700 dark:text-zinc-200 shadow-sm hover:shadow-md transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+                    class="inline-flex items-center justify-center gap-2.5 px-8 py-3.5 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:border-indigo-400 dark:hover:border-indigo-500 hover:bg-zinc-50 dark:hover:bg-zinc-800/80 text-sm font-semibold text-zinc-700 dark:text-zinc-200 shadow-sm hover:shadow-md transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
                 >
                     <span wire:loading.remove wire:target="loadMore">
                         Load more articles
