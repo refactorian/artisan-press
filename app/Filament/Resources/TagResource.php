@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Forms\Components\SeoFields;
 use App\Filament\Resources\TagResource\Pages;
 use App\Models\Tag;
 use Filament\Forms\Components\Section;
@@ -43,6 +44,8 @@ class TagResource extends Resource
                     ->maxLength(255)
                     ->unique(Tag::class, 'slug', ignoreRecord: true),
             ])->columns(2),
+
+            SeoFields::make('Tag SEO & Search Directives'),
         ]);
     }
 
@@ -93,9 +96,9 @@ class TagResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index'  => Pages\ListTags::route('/'),
+            'index' => Pages\ListTags::route('/'),
             'create' => Pages\CreateTag::route('/create'),
-            'edit'   => Pages\EditTag::route('/{record}/edit'),
+            'edit' => Pages\EditTag::route('/{record}/edit'),
         ];
     }
 }

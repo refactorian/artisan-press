@@ -4,7 +4,9 @@ namespace App\Models;
 
 use App\Enums\PageStatus;
 use App\Enums\PageTemplate;
+use App\Observers\PageObserver;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -14,6 +16,7 @@ use Spatie\Activitylog\Support\LogOptions;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 
+#[ObservedBy([PageObserver::class])]
 #[Fillable([
     'title',
     'slug',

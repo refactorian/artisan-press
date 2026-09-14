@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
+use App\Observers\TagObserver;
 use Database\Factories\TagFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -12,7 +14,16 @@ use Spatie\Activitylog\Support\LogOptions;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 
-#[Fillable(['name', 'slug'])]
+#[ObservedBy([TagObserver::class])]
+#[Fillable([
+    'name',
+    'slug',
+    'seo_title',
+    'seo_description',
+    'canonical_url',
+    'noindex',
+    'nofollow',
+])]
 class Tag extends Model
 {
     /** @use HasFactory<TagFactory> */
@@ -20,7 +31,10 @@ class Tag extends Model
 
     protected function casts(): array
     {
-        return [];
+        return [
+            'noindex' => 'boolean',
+            'nofollow' => 'boolean',
+        ];
     }
 
     public function getActivitylogOptions(): LogOptions

@@ -64,6 +64,12 @@ class ManageSiteSettings extends Page implements HasForms
             'search_driver' => Setting::get('search_driver', 'database'),
             'search_min_chars' => Setting::get('search_min_chars', 3),
             'search_highlight' => Setting::get('search_highlight', true),
+
+            // Webhooks & Integrations
+            'webhook_url' => Setting::get('webhook_url', ''),
+            'webhook_secret' => Setting::get('webhook_secret', ''),
+            'newsletter_provider' => Setting::get('newsletter_provider', 'database'),
+            'newsletter_api_key' => Setting::get('newsletter_api_key', ''),
         ]);
     }
 
@@ -181,6 +187,40 @@ class ManageSiteSettings extends Page implements HasForms
                                     ->label('Highlight Search Terms in Results')
                                     ->default(true),
                             ]),
+
+                        Tab::make('Webhooks & Integrations')
+                            ->icon('heroicon-o-bolt')
+                            ->schema([
+                                TextInput::make('webhook_url')
+                                    ->label('Outbound Webhook Endpoint')
+                                    ->placeholder('https://api.example.com/webhooks/blog')
+                                    ->url()
+                                    ->helperText('Receives JSON payload on post.published, post.updated, and post.deleted events.'),
+
+                                TextInput::make('webhook_secret')
+                                    ->label('Webhook Secret (HMAC-SHA256)')
+                                    ->password()
+                                    ->revealable()
+                                    ->helperText('Used to sign the X-Blog-Signature header on outgoing requests.'),
+
+                                Grid::make(2)->schema([
+                                    Select::make('newsletter_provider')
+                                        ->label('Newsletter Service Provider')
+                                        ->options([
+                                            'database' => 'Internal Subscribers Database',
+                                            'mailchimp' => 'Mailchimp',
+                                            'convertkit' => 'Kit (ConvertKit)',
+                                            'beehiiv' => 'Beehiiv',
+                                        ])
+                                        ->default('database'),
+
+                                    TextInput::make('newsletter_api_key')
+                                        ->label('Provider API Key / Token')
+                                        ->password()
+                                        ->revealable()
+                                        ->helperText('External newsletter service credential.'),
+                                ]),
+                            ]),
                     ]),
             ])
             ->statePath('data');
@@ -196,6 +236,7 @@ class ManageSiteSettings extends Page implements HasForms
                 str_contains($key, 'footer') || str_contains($key, 'scripts') => 'header_footer',
                 str_contains($key, 'comment') || str_contains($key, 'spam') => 'comments',
                 str_contains($key, 'search') => 'search',
+                str_contains($key, 'webhook') || str_contains($key, 'newsletter') => 'integrations',
                 default => 'general',
             };
 

@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
+use App\Observers\CategoryObserver;
 use Database\Factories\CategoryFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -16,7 +18,20 @@ use Spatie\Activitylog\Support\LogOptions;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 
-#[Fillable(['parent_id', 'name', 'slug', 'description', 'sort_order', 'is_active'])]
+#[ObservedBy([CategoryObserver::class])]
+#[Fillable([
+    'parent_id',
+    'name',
+    'slug',
+    'description',
+    'sort_order',
+    'is_active',
+    'seo_title',
+    'seo_description',
+    'canonical_url',
+    'noindex',
+    'nofollow',
+])]
 class Category extends Model
 {
     /** @use HasFactory<CategoryFactory> */
@@ -27,6 +42,8 @@ class Category extends Model
         return [
             'is_active' => 'boolean',
             'sort_order' => 'integer',
+            'noindex' => 'boolean',
+            'nofollow' => 'boolean',
         ];
     }
 

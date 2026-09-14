@@ -45,6 +45,8 @@ class AdminPanelProvider extends PanelProvider
                 NavigationGroup::make()
                     ->label('Engagement'),
                 NavigationGroup::make()
+                    ->label('Analytics & Reports'),
+                NavigationGroup::make()
                     ->label('Navigation & Structure'),
                 NavigationGroup::make()
                     ->label('Settings & Audit'),

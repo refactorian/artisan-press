@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Forms\Components\SeoFields;
 use App\Filament\Resources\CategoryResource\Pages;
 use App\Models\Category;
 use Filament\Forms\Components\Section;
@@ -74,6 +75,8 @@ class CategoryResource extends Resource
                     ->label('Active')
                     ->default(true),
             ])->columns(2),
+
+            SeoFields::make('Category SEO & Search Directives'),
         ]);
     }
 

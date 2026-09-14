@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Enums\PostStatus;
 use App\Filament\Forms\Components\ContentBlocksBuilder;
+use App\Filament\Forms\Components\SeoFields;
 use App\Filament\Resources\PostResource\Pages;
 use App\Filament\Resources\PostResource\RelationManagers\CommentsRelationManager;
 use App\Filament\Resources\PostResource\RelationManagers\RevisionsRelationManager;
@@ -120,36 +121,7 @@ class PostResource extends Resource
                                 ->helperText('Recommended: 1200×675px (16:9). Max 5MB.'),
                         ]),
 
-                    Section::make('SEO & Social Sharing')
-                        ->collapsed()
-                        ->schema([
-                            TextInput::make('seo_title')
-                                ->label('SEO Title')
-                                ->maxLength(70)
-                                ->helperText('Leave blank to use the post title. Recommended: 50–70 characters.'),
-
-                            Textarea::make('seo_description')
-                                ->label('SEO Description')
-                                ->rows(3)
-                                ->maxLength(160)
-                                ->helperText('Recommended: 120–160 characters.'),
-
-                            TextInput::make('canonical_url')
-                                ->label('Canonical URL')
-                                ->url()
-                                ->maxLength(2048)
-                                ->helperText('Leave blank to use the default post URL.'),
-
-                            Grid::make(2)->schema([
-                                Toggle::make('noindex')
-                                    ->label('Noindex')
-                                    ->helperText('Exclude from search engine results.'),
-
-                                Toggle::make('nofollow')
-                                    ->label('Nofollow')
-                                    ->helperText('Do not follow links in this post.'),
-                            ]),
-                        ]),
+                    SeoFields::make('SEO & Social Sharing'),
                 ]),
 
                 // ── Right Sidebar ──────────────────────────────────────────────
@@ -330,6 +302,12 @@ class PostResource extends Resource
                     ->sortable()
                     ->placeholder('Not published'),
 
+                TextColumn::make('reading_time')
+                    ->label('Read Time')
+                    ->suffix(' min')
+                    ->alignCenter()
+                    ->sortable(),
+
                 TextColumn::make('view_count')
                     ->label('Views')
                     ->numeric()
@@ -433,6 +411,33 @@ class PostResource extends Resource
                         ->action(fn (Collection $records) => $records->each->update(['status' => PostStatus::Draft]))
                         ->requiresConfirmation()
                         ->deselectRecordsAfterCompletion(),
+
+                    BulkAction::make('export_selected')
+                        ->label('Export Selected (JSON)')
+                        ->icon('heroicon-o-arrow-down-tray')
+                        ->color('gray')
+                        ->action(function (Collection $records) {
+                            $data = $records->map(fn (Post $p) => [
+                                'id' => $p->id,
+                                'title' => $p->title,
+                                'slug' => $p->slug,
+                                'excerpt' => $p->excerpt,
+                                'content' => $p->content,
+                                'status' => $p->status->value,
+                                'published_at' => $p->published_at?->toIso8601String(),
+                                'reading_time' => $p->reading_time,
+                                'view_count' => $p->view_count,
+                                'seo_title' => $p->seo_title,
+                                'seo_description' => $p->seo_description,
+                                'canonical_url' => $p->canonical_url,
+                            ]);
+
+                            $filename = 'posts-selection-export-'.now()->format('Y-m-d-His').'.json';
+
+                            return response()->streamDownload(function () use ($data) {
+                                echo json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+                            }, $filename, ['Content-Type' => 'application/json']);
+                        }),
 
                     DeleteBulkAction::make(),
                     RestoreBulkAction::make(),

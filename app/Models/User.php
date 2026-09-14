@@ -32,6 +32,11 @@ use Spatie\Permission\Traits\HasRoles;
     'social_links',
     'is_featured_author',
     'is_active',
+    'seo_title',
+    'seo_description',
+    'canonical_url',
+    'noindex',
+    'nofollow',
 ])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable implements FilamentUser, HasAvatar, HasMedia
@@ -52,6 +57,8 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, HasMedia
             'is_active' => 'boolean',
             'is_featured_author' => 'boolean',
             'social_links' => 'array',
+            'noindex' => 'boolean',
+            'nofollow' => 'boolean',
         ];
     }
 

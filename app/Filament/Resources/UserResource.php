@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Forms\Components\SeoFields;
 use App\Filament\Resources\UserResource\Pages;
 use App\Models\User;
 use Filament\Forms\Components\FileUpload;
@@ -142,6 +143,8 @@ class UserResource extends Resource
                         ->cloneable()
                         ->defaultItems(0),
                 ]),
+
+            SeoFields::make('Author Archive SEO & Social Directives'),
         ]);
     }
 

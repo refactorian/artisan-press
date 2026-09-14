@@ -46,6 +46,7 @@ use Spatie\Sluggable\SlugOptions;
     'noindex',
     'nofollow',
     'view_count',
+    'reading_time',
 ])]
 class Post extends Model implements HasMedia
 {
@@ -63,6 +64,7 @@ class Post extends Model implements HasMedia
             'noindex' => 'boolean',
             'nofollow' => 'boolean',
             'view_count' => 'integer',
+            'reading_time' => 'integer',
             'is_featured' => 'boolean',
             'is_hero' => 'boolean',
             'featured_order' => 'integer',
@@ -115,10 +117,22 @@ class Post extends Model implements HasMedia
     {
         $this->addMediaConversion('thumb')
             ->fit(Fit::Crop, 400, 300)
+            ->format('webp')
+            ->nonQueued();
+
+        $this->addMediaConversion('medium')
+            ->fit(Fit::Crop, 800, 450)
+            ->format('webp')
+            ->nonQueued();
+
+        $this->addMediaConversion('large')
+            ->fit(Fit::Crop, 1200, 675)
+            ->format('webp')
             ->nonQueued();
 
         $this->addMediaConversion('og')
             ->fit(Fit::Crop, 1200, 630)
+            ->format('webp')
             ->nonQueued();
     }
 
@@ -176,6 +190,11 @@ class Post extends Model implements HasMedia
             ->orderBy('created_at', 'desc');
     }
 
+    public function views(): HasMany
+    {
+        return $this->hasMany(PostView::class);
+    }
+
     // ─── Scopes ────────────────────────────────────────────────────────────────
 
     public function scopePublished(Builder $query): Builder
@@ -207,6 +226,22 @@ class Post extends Model implements HasMedia
         return $query->where('is_hero', true);
     }
 
+    public function scopeTrending(Builder $query, int $days = 7): Builder
+    {
+        return $query->published()
+            ->withCount(['views' => function ($q) use ($days) {
+                $q->where('viewed_date', '>=', now()->subDays($days)->toDateString());
+            }])
+            ->orderByDesc('views_count')
+            ->orderByDesc('view_count');
+    }
+
+    public function scopePopular(Builder $query): Builder
+    {
+        return $query->published()
+            ->orderByDesc('view_count');
+    }
+
     // ─── Helpers ───────────────────────────────────────────────────────────────
 
     public function isPublished(): bool
@@ -227,6 +262,30 @@ class Post extends Model implements HasMedia
     public function incrementViewCount(): void
     {
         $this->increment('view_count');
+    }
+
+    /**
+     * Calculate estimated reading time in minutes based on body content.
+     */
+    public function calculateReadingTime(): int
+    {
+        $text = strip_tags($this->content ?? '');
+
+        if (! empty($this->content_blocks) && is_array($this->content_blocks)) {
+            foreach ($this->content_blocks as $block) {
+                if (isset($block['data']) && is_array($block['data'])) {
+                    foreach ($block['data'] as $value) {
+                        if (is_string($value)) {
+                            $text .= ' '.strip_tags($value);
+                        }
+                    }
+                }
+            }
+        }
+
+        $wordCount = str_word_count($text);
+
+        return max(1, (int) ceil($wordCount / 200));
     }
 
     public function createRevision(?string $reason = null, ?int $userId = null): PostRevision

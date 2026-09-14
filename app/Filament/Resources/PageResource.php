@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Enums\PageStatus;
 use App\Enums\PageTemplate;
 use App\Filament\Forms\Components\ContentBlocksBuilder;
+use App\Filament\Forms\Components\SeoFields;
 use App\Filament\Resources\PageResource\Pages;
 use App\Models\Page;
 use Filament\Forms\Components\DateTimePicker;
@@ -12,9 +13,7 @@ use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Group;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
@@ -78,17 +77,7 @@ class PageResource extends Resource
                             ContentBlocksBuilder::make('content_blocks'),
                         ]),
 
-                    Section::make('SEO & Meta')
-                        ->collapsed()
-                        ->schema([
-                            TextInput::make('seo_title')->maxLength(70),
-                            Textarea::make('seo_description')->rows(3)->maxLength(160),
-                            TextInput::make('canonical_url')->url(),
-                            Grid::make(2)->schema([
-                                Toggle::make('noindex'),
-                                Toggle::make('nofollow'),
-                            ]),
-                        ]),
+                    SeoFields::make('Page SEO & Metadata'),
                 ]),
 
                 Group::make()->columnSpan(['lg' => 1])->schema([
