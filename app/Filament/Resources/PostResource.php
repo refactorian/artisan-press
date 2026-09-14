@@ -7,7 +7,6 @@ use App\Filament\Forms\Components\ContentBlocksBuilder;
 use App\Filament\Forms\Components\SeoFields;
 use App\Filament\Resources\PostResource\Pages;
 use App\Filament\Resources\PostResource\RelationManagers\CommentsRelationManager;
-use App\Filament\Resources\PostResource\RelationManagers\RevisionsRelationManager;
 use App\Models\Post;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Grid;
@@ -452,7 +451,6 @@ class PostResource extends Resource
     public static function getRelations(): array
     {
         return [
-            RevisionsRelationManager::class,
             CommentsRelationManager::class,
         ];
     }

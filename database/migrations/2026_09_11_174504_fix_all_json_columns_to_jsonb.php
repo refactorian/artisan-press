@@ -22,7 +22,6 @@ return new class extends Migration
             'activity_log' => ['properties', 'attribute_changes'],
             'media' => ['custom_properties', 'generated_conversions', 'manipulations', 'responsive_images'],
             'pages' => ['content_blocks'],
-            'post_revisions' => ['content_blocks'],
             'posts' => ['content_blocks'],
             'users' => ['social_links'],
         ];
@@ -51,7 +50,6 @@ return new class extends Migration
             'activity_log' => ['properties', 'attribute_changes'],
             'media' => ['custom_properties', 'generated_conversions', 'manipulations', 'responsive_images'],
             'pages' => ['content_blocks'],
-            'post_revisions' => ['content_blocks'],
             'posts' => ['content_blocks'],
             'users' => ['social_links'],
         ];

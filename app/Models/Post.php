@@ -172,11 +172,6 @@ class Post extends Model implements HasMedia
         return $this->belongsToMany(Tag::class);
     }
 
-    public function revisions(): HasMany
-    {
-        return $this->hasMany(PostRevision::class)->orderBy('created_at', 'desc');
-    }
-
     public function comments(): HasMany
     {
         return $this->hasMany(Comment::class)->orderBy('created_at', 'desc');
@@ -286,18 +281,5 @@ class Post extends Model implements HasMedia
         $wordCount = str_word_count($text);
 
         return max(1, (int) ceil($wordCount / 200));
-    }
-
-    public function createRevision(?string $reason = null, ?int $userId = null): PostRevision
-    {
-        return $this->revisions()->create([
-            'user_id' => $userId ?? auth()->id() ?? $this->user_id,
-            'title' => $this->title,
-            'slug' => $this->slug,
-            'excerpt' => $this->excerpt,
-            'content' => $this->content,
-            'content_blocks' => $this->content_blocks,
-            'reason' => $reason,
-        ]);
     }
 }

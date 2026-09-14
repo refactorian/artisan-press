@@ -40,7 +40,6 @@ class PostObserver
 
     /**
      * Handle the Post "updating" event.
-     * Snapshot revision if content or title changed.
      * Record 301 redirect if slug changed on a published post.
      */
     public function updating(Post $post): void
@@ -57,21 +56,6 @@ class PostObserver
                     ]
                 );
             }
-        }
-
-        if ($post->isDirty(['title', 'excerpt', 'content', 'content_blocks'])) {
-            $original = $post->getOriginal();
-            $post->revisions()->create([
-                'user_id' => auth()->id() ?? $post->user_id,
-                'title' => $original['title'] ?? $post->title,
-                'slug' => $original['slug'] ?? $post->slug,
-                'excerpt' => $original['excerpt'] ?? $post->excerpt,
-                'content' => $original['content'] ?? $post->content,
-                'content_blocks' => isset($original['content_blocks']) && is_string($original['content_blocks'])
-                    ? json_decode($original['content_blocks'], true)
-                    : ($original['content_blocks'] ?? null),
-                'reason' => 'Auto-snapshot before update',
-            ]);
         }
     }
 

@@ -5,10 +5,8 @@ namespace App\Filament\Resources\PostResource\Pages;
 use App\Filament\Resources\PostResource;
 use App\Models\Post;
 use Filament\Actions;
-use Filament\Forms\Components\TextInput;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Components\TextEntry\TextEntrySize;
-use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
 
 class EditPost extends EditRecord
@@ -39,24 +37,6 @@ class EditPost extends EditRecord
                         ->label('Content Body')
                         ->html(),
                 ]),
-
-            Actions\Action::make('create_snapshot')
-                ->label('Save Revision Snapshot')
-                ->icon('heroicon-m-camera')
-                ->color('gray')
-                ->form([
-                    TextInput::make('reason')
-                        ->label('Snapshot Note')
-                        ->placeholder('e.g. Pre-publish backup, major rewrite')
-                        ->required(),
-                ])
-                ->action(function (array $data, Post $record) {
-                    $record->createRevision($data['reason'], auth()->id());
-                    Notification::make()
-                        ->title('Snapshot Saved')
-                        ->success()
-                        ->send();
-                }),
 
             Actions\DeleteAction::make(),
             Actions\ForceDeleteAction::make(),
