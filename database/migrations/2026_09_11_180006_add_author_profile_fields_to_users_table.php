@@ -12,7 +12,7 @@ return new class extends Migration
             $table->string('job_title')->nullable()->after('bio');
             $table->string('pronouns')->nullable()->after('job_title');
             $table->string('website_url')->nullable()->after('pronouns');
-            $table->json('social_links')->nullable()->after('website_url');
+            $table->jsonb('social_links')->nullable()->after('website_url');
             $table->boolean('is_featured_author')->default(false)->after('social_links');
 
             $table->index('is_featured_author');

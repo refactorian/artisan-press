@@ -15,7 +15,7 @@ return new class extends Migration
             $table->boolean('is_hero')->default(false)->after('is_featured');
             $table->integer('featured_order')->nullable()->after('is_hero');
             $table->integer('sort_order')->default(0)->after('featured_order');
-            $table->json('content_blocks')->nullable()->after('content');
+            $table->jsonb('content_blocks')->nullable()->after('content');
 
             $table->index('is_featured');
             $table->index('is_hero');
