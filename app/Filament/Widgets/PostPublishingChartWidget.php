@@ -8,9 +8,14 @@ use Filament\Widgets\ChartWidget;
 
 class PostPublishingChartWidget extends ChartWidget
 {
-    protected static ?string $heading = 'Post Status Distribution';
+    protected static ?string $heading = 'Publishing Status Breakdown';
 
-    protected static ?int $sort = 2;
+    protected static ?int $sort = 3;
+
+    protected int|string|array $columnSpan = [
+        'default' => 'full',
+        'xl' => 1,
+    ];
 
     protected function getData(): array
     {
@@ -21,9 +26,16 @@ class PostPublishingChartWidget extends ChartWidget
         return [
             'datasets' => [
                 [
-                    'label' => 'Posts',
+                    'label' => 'Articles',
                     'data' => [$published, $draft, $scheduled],
-                    'backgroundColor' => ['#10b981', '#6b7280', '#f59e0b'],
+                    'backgroundColor' => [
+                        '#6366f1', // Indigo (Published)
+                        '#71717a', // Zinc (Draft)
+                        '#f59e0b', // Amber (Scheduled)
+                    ],
+                    'borderWidth' => 2,
+                    'borderColor' => 'transparent',
+                    'hoverOffset' => 4,
                 ],
             ],
             'labels' => ['Published', 'Drafts', 'Scheduled'],
@@ -33,5 +45,22 @@ class PostPublishingChartWidget extends ChartWidget
     protected function getType(): string
     {
         return 'doughnut';
+    }
+
+    protected function getOptions(): array
+    {
+        return [
+            'plugins' => [
+                'legend' => [
+                    'display' => true,
+                    'position' => 'bottom',
+                    'labels' => [
+                        'usePointStyle' => true,
+                        'padding' => 16,
+                    ],
+                ],
+            ],
+            'cutout' => '72%',
+        ];
     }
 }
