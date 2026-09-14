@@ -130,8 +130,48 @@
                     @endif
                 </div>
             @else
-                <div class="p-6 text-center text-xs text-zinc-400 dark:text-zinc-500">
-                    Type at least 2 characters to search across all published articles...
+                <div class="p-6 space-y-4">
+                    @if($suggestions->isNotEmpty())
+                        <div>
+                            <span class="text-[11px] font-bold uppercase tracking-wider text-zinc-400 block mb-2">
+                                Suggested searches:
+                            </span>
+                            <div class="flex flex-wrap gap-1.5">
+                                @foreach($suggestions as $sug)
+                                    <button
+                                        type="button"
+                                        wire:click="$set('query', '{{ $sug }}')"
+                                        class="px-2.5 py-1 rounded-lg bg-zinc-100 dark:bg-zinc-800 hover:bg-indigo-50 dark:hover:bg-indigo-950 text-xs text-zinc-700 dark:text-zinc-300 transition-colors cursor-pointer"
+                                    >
+                                        {{ $sug }}
+                                    </button>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
+
+                    @if($topCategories->isNotEmpty())
+                        <div class="pt-2">
+                            <span class="text-[11px] font-bold uppercase tracking-wider text-zinc-400 block mb-2">
+                                Browse Topics:
+                            </span>
+                            <div class="flex flex-wrap gap-2">
+                                @foreach($topCategories as $cat)
+                                    <a
+                                        href="{{ route('categories.show', $cat) }}"
+                                        @click="isOpen = false"
+                                        class="px-3 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-xs font-semibold text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900 transition-colors"
+                                    >
+                                        {{ $cat->name }}
+                                    </a>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
+
+                    <div class="pt-2 text-center text-xs text-zinc-400 dark:text-zinc-500">
+                        Type at least 2 characters to search across all published articles...
+                    </div>
                 </div>
             @endif
         </div>

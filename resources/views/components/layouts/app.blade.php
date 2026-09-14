@@ -58,6 +58,39 @@
     <!-- Global Quick Search Dialog Modal -->
     <livewire:quick-search />
 
+    <!-- Saved Reading List Drawer -->
+    <x-saved-articles-modal />
+
+    <!-- Global Toast Notification System -->
+    <x-toast />
+
+    <!-- Global Helpers Script -->
+    <script>
+        window.$bookmarks = {
+            isSaved(slug) {
+                try {
+                    const list = JSON.parse(localStorage.getItem('saved_articles') || '[]');
+                    return list.some(i => i.slug === slug);
+                } catch(e) { return false; }
+            },
+            toggle(article) {
+                try {
+                    let list = JSON.parse(localStorage.getItem('saved_articles') || '[]');
+                    const exists = list.some(i => i.slug === article.slug);
+                    if (exists) {
+                        list = list.filter(i => i.slug !== article.slug);
+                        window.dispatchEvent(new CustomEvent('toast', { detail: { message: 'Article removed from saved reading list', type: 'info' } }));
+                    } else {
+                        list.unshift(article);
+                        window.dispatchEvent(new CustomEvent('toast', { detail: { message: 'Article saved to reading list', type: 'success' } }));
+                    }
+                    localStorage.setItem('saved_articles', JSON.stringify(list));
+                    window.dispatchEvent(new CustomEvent('bookmarks-updated'));
+                } catch(e) {}
+            }
+        };
+    </script>
+
     @livewireScripts
 </body>
 </html>

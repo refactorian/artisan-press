@@ -47,8 +47,23 @@ class QuickSearch extends Component
             }
         }
 
+        $suggestions = \App\Models\SearchLog::select('query')
+            ->selectRaw('count(*) as count')
+            ->groupBy('query')
+            ->orderByDesc('count')
+            ->limit(4)
+            ->pluck('query');
+
+        $topCategories = \App\Models\Category::active()
+            ->whereHas('posts', fn ($q) => $q->published())
+            ->orderBy('sort_order')
+            ->limit(4)
+            ->get();
+
         return view('livewire.quick-search', [
             'results' => $results,
+            'suggestions' => $suggestions,
+            'topCategories' => $topCategories,
         ]);
     }
 }

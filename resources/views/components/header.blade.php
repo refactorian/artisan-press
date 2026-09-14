@@ -35,19 +35,56 @@
             <nav class="hidden md:flex items-center gap-1">
                 @foreach($menuItems as $item)
                     @php
+                        $hasChildren = !empty($item->children) && count($item->children) > 0;
                         $isActive = request()->is(ltrim($item->url, '/')) || (request()->routeIs('home') && $item->url === '/');
                     @endphp
-                    <a
-                        href="{{ $item->url }}"
-                        class="px-3 py-1.5 rounded-lg text-sm font-medium transition-colors {{ $isActive ? 'text-indigo-600 dark:text-indigo-400 bg-indigo-50/70 dark:bg-indigo-950/50' : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-850' }}"
-                    >
-                        {{ $item->label }}
-                    </a>
+
+                    @if($hasChildren)
+                        <div class="relative" x-data="{ open: false }" @click.outside="open = false">
+                            <button
+                                type="button"
+                                @click="open = !open"
+                                class="flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-850 cursor-pointer"
+                            >
+                                <span>{{ $item->label }}</span>
+                                <svg class="w-3.5 h-3.5 transition-transform" :class="{ 'rotate-180': open }" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                                </svg>
+                            </button>
+
+                            <div
+                                x-show="open"
+                                x-transition:enter="ease-out duration-150"
+                                x-transition:enter-start="opacity-0 translate-y-1"
+                                x-transition:enter-end="opacity-100 translate-y-0"
+                                x-transition:leave="ease-in duration-100"
+                                x-transition:leave-start="opacity-100 translate-y-0"
+                                x-transition:leave-end="opacity-0 translate-y-1"
+                                class="absolute left-0 mt-1 w-48 rounded-xl bg-white dark:bg-zinc-900 shadow-xl border border-zinc-200/80 dark:border-zinc-800 py-1.5 z-50"
+                            >
+                                @foreach($item->children as $child)
+                                    <a
+                                        href="{{ $child->url }}"
+                                        class="block px-3.5 py-1.5 text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-indigo-600 dark:hover:text-indigo-400"
+                                    >
+                                        {{ $child->label }}
+                                    </a>
+                                @endforeach
+                            </div>
+                        </div>
+                    @else
+                        <a
+                            href="{{ $item->url }}"
+                            class="px-3 py-1.5 rounded-lg text-sm font-medium transition-colors {{ $isActive ? 'text-indigo-600 dark:text-indigo-400 bg-indigo-50/70 dark:bg-indigo-950/50' : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-850' }}"
+                        >
+                            {{ $item->label }}
+                        </a>
+                    @endif
                 @endforeach
             </nav>
         </div>
 
-        <!-- Header Actions: Search, Theme Toggle, Mobile Toggle -->
+        <!-- Header Actions: Search, Saved Bookmarks, Theme Toggle, Mobile Toggle -->
         <div class="flex items-center gap-2.5">
             <!-- Search Trigger Button -->
             <button
@@ -63,6 +100,33 @@
                 <kbd class="hidden sm:inline-block rounded px-1 py-0.5 text-[10px] font-semibold text-zinc-400 bg-zinc-200/60 dark:bg-zinc-800">
                     ⌘K
                 </kbd>
+            </button>
+
+            <!-- Saved Articles Reading List Button -->
+            <button
+                type="button"
+                x-data="{
+                    count: 0,
+                    init() {
+                        this.update();
+                        window.addEventListener('bookmarks-updated', () => this.update());
+                    },
+                    update() {
+                        try {
+                            this.count = JSON.parse(localStorage.getItem('saved_articles') || '[]').length;
+                        } catch(e) {
+                            this.count = 0;
+                        }
+                    }
+                }"
+                @click="$dispatch('open-saved-articles')"
+                class="relative p-2 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:border-zinc-300 dark:hover:border-zinc-700 transition-all cursor-pointer"
+                title="Saved Reading List"
+            >
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
+                </svg>
+                <span x-show="count > 0" x-text="count" class="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-indigo-600 text-white text-[10px] font-bold flex items-center justify-center"></span>
             </button>
 
             <!-- Dark / Light Mode Switcher -->

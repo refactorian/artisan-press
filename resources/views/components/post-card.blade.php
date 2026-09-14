@@ -86,9 +86,39 @@
                     </a>
                 @endif
 
-                <time datetime="{{ $post->published_at?->toISOString() }}" class="text-zinc-400 dark:text-zinc-500">
-                    {{ $post->published_at?->format('M j, Y') ?? 'Recently' }}
-                </time>
+                <div class="flex items-center gap-3">
+                    <time datetime="{{ $post->published_at?->toISOString() }}" class="text-zinc-400 dark:text-zinc-500">
+                        {{ $post->published_at?->format('M j, Y') ?? 'Recently' }}
+                    </time>
+
+                    <button
+                        type="button"
+                        x-data="{
+                            saved: false,
+                            check() { this.saved = window.$bookmarks ? window.$bookmarks.isSaved('{{ $post->slug }}') : false; },
+                            toggle() {
+                                if (window.$bookmarks) {
+                                    window.$bookmarks.toggle({
+                                        title: '{{ addslashes($post->title) }}',
+                                        slug: '{{ $post->slug }}',
+                                        url: '{{ route('posts.show', $post) }}',
+                                        category: '{{ addslashes($category?->name ?? '') }}',
+                                        reading_time: {{ $readingTime }}
+                                    });
+                                    this.check();
+                                }
+                            }
+                        }"
+                        x-init="check(); window.addEventListener('bookmarks-updated', () => check())"
+                        @click.prevent.stop="toggle()"
+                        class="p-1 rounded-lg text-zinc-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors cursor-pointer"
+                        :title="saved ? 'Remove from saved reading list' : 'Save article for later'"
+                    >
+                        <svg class="w-4 h-4" :class="{ 'text-indigo-600 dark:text-indigo-400': saved }" :fill="saved ? 'currentColor' : 'none'" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
+                        </svg>
+                    </button>
+                </div>
             </div>
         </div>
     </article>
@@ -167,9 +197,39 @@
                     </a>
                 @endif
 
-                <time datetime="{{ $post->published_at?->toISOString() }}" class="text-zinc-400 dark:text-zinc-500">
-                    {{ $post->published_at?->format('M j, Y') ?? 'Recently' }}
-                </time>
+                <div class="flex items-center gap-3">
+                    <time datetime="{{ $post->published_at?->toISOString() }}" class="text-zinc-400 dark:text-zinc-500">
+                        {{ $post->published_at?->format('M j, Y') ?? 'Recently' }}
+                    </time>
+
+                    <button
+                        type="button"
+                        x-data="{
+                            saved: false,
+                            check() { this.saved = window.$bookmarks ? window.$bookmarks.isSaved('{{ $post->slug }}') : false; },
+                            toggle() {
+                                if (window.$bookmarks) {
+                                    window.$bookmarks.toggle({
+                                        title: '{{ addslashes($post->title) }}',
+                                        slug: '{{ $post->slug }}',
+                                        url: '{{ route('posts.show', $post) }}',
+                                        category: '{{ addslashes($category?->name ?? '') }}',
+                                        reading_time: {{ $readingTime }}
+                                    });
+                                    this.check();
+                                }
+                            }
+                        }"
+                        x-init="check(); window.addEventListener('bookmarks-updated', () => check())"
+                        @click.prevent.stop="toggle()"
+                        class="p-1 rounded-lg text-zinc-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors cursor-pointer"
+                        :title="saved ? 'Remove from saved reading list' : 'Save article for later'"
+                    >
+                        <svg class="w-4 h-4" :class="{ 'text-indigo-600 dark:text-indigo-400': saved }" :fill="saved ? 'currentColor' : 'none'" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
+                        </svg>
+                    </button>
+                </div>
             </div>
         </div>
     </article>
