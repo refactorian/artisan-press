@@ -190,6 +190,18 @@ class Post extends Model implements HasMedia
         return $this->hasMany(PostView::class);
     }
 
+    public function likes(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'post_likes')
+            ->withTimestamps();
+    }
+
+    public function bookmarks(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'post_bookmarks')
+            ->withTimestamps();
+    }
+
     // ─── Scopes ────────────────────────────────────────────────────────────────
 
     public function scopePublished(Builder $query): Builder

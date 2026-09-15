@@ -55,13 +55,23 @@ class CommentController extends Controller
             ], 201);
         }
 
-        $validated = $request->validate([
-            'guest_name' => ['required', 'string', 'max:100'],
-            'guest_email' => ['required', 'email', 'max:255'],
-            'guest_website' => ['nullable', 'url', 'max:255'],
+        $user = $request->user('sanctum') ?? $request->user();
+
+        $rules = [
             'content' => ['required', 'string', 'min:3', 'max:2000'],
             'parent_id' => ['nullable', 'integer', 'exists:comments,id'],
-        ]);
+            'guest_website' => ['nullable', 'url', 'max:255'],
+        ];
+
+        if (! $user) {
+            $rules['guest_name'] = ['required', 'string', 'max:100'];
+            $rules['guest_email'] = ['required', 'email', 'max:255'];
+        } else {
+            $rules['guest_name'] = ['nullable', 'string', 'max:100'];
+            $rules['guest_email'] = ['nullable', 'email', 'max:255'];
+        }
+
+        $validated = $request->validate($rules);
 
         // Validate parent comment belongs to the same post
         if (! empty($validated['parent_id'])) {
@@ -100,8 +110,9 @@ class CommentController extends Controller
         /** @var Comment $comment */
         $comment = $post->comments()->create([
             'parent_id' => $validated['parent_id'] ?? null,
-            'guest_name' => $validated['guest_name'],
-            'guest_email' => $validated['guest_email'],
+            'user_id' => $user?->id,
+            'guest_name' => $user ? ($validated['guest_name'] ?? $user->name) : $validated['guest_name'],
+            'guest_email' => $user ? ($validated['guest_email'] ?? $user->email) : $validated['guest_email'],
             'guest_website' => $validated['guest_website'] ?? null,
             'content' => $validated['content'],
             'status' => $status,
@@ -121,5 +132,33 @@ class CommentController extends Controller
                 : 'Your comment has been submitted and is awaiting moderation.',
             'comment' => new CommentResource($comment),
         ], 201);
+    }
+
+    /**
+     * Delete the authenticated user's comment.
+     */
+    public function destroy(string $slug, int $id, Request $request): JsonResponse
+    {
+        $post = Post::published()->where('slug', $slug)->firstOrFail();
+
+        $comment = Comment::where('post_id', $post->id)
+            ->where('id', $id)
+            ->firstOrFail();
+
+        $user = $request->user();
+
+        if ($comment->user_id !== $user->id && ! $user->hasAnyRole(['super_admin', 'admin'])) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'You do not have permission to delete this comment.',
+            ], 403);
+        }
+
+        $comment->delete();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Comment deleted successfully.',
+        ]);
     }
 }

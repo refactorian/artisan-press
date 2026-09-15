@@ -4,46 +4,47 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\V1\PostResource;
-use App\Http\Resources\Api\V1\TagResource;
-use App\Models\Tag;
+use App\Http\Resources\Api\V1\SeriesResource;
+use App\Models\Series;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
-class TagController extends Controller
+class SeriesController extends Controller
 {
     /**
-     * Display a listing of tags.
+     * Display a listing of active series.
      */
     public function index(): AnonymousResourceCollection
     {
-        $tags = Tag::whereHas('posts', fn ($q) => $q->published())
+        $series = Series::active()
             ->withCount(['posts' => fn ($q) => $q->published()])
-            ->orderByDesc('posts_count')
+            ->orderBy('sort_order')
             ->get();
 
-        return TagResource::collection($tags);
+        return SeriesResource::collection($series);
     }
 
     /**
-     * Display the specified tag along with its paginated posts.
+     * Display the specified series along with its paginated posts.
      */
     public function show(string $slug, Request $request): JsonResponse
     {
-        $tag = Tag::where('slug', $slug)
+        $series = Series::active()
+            ->where('slug', $slug)
             ->withCount(['posts' => fn ($q) => $q->published()])
             ->firstOrFail();
 
         $perPage = min(max($request->integer('per_page', 10), 1), 50);
 
-        $posts = $tag->posts()
+        $posts = $series->posts()
             ->published()
             ->with(['author', 'categories', 'tags', 'media'])
-            ->orderBy('published_at', 'desc')
+            ->orderBy('series_order', 'asc')
             ->paginate($perPage);
 
         return response()->json([
-            'tag' => new TagResource($tag),
+            'series' => new SeriesResource($series),
             'posts' => PostResource::collection($posts)->response()->getData(true),
         ]);
     }

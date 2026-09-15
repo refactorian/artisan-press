@@ -41,9 +41,9 @@ class ListMedia extends ListRecords
                     Select::make('collection_name')
                         ->label('Collection')
                         ->options([
-                            'images'    => 'Images',
+                            'images' => 'Images',
                             'documents' => 'Documents',
-                            'default'   => 'Default',
+                            'default' => 'Default',
                         ])
                         ->default('images')
                         ->required(),
@@ -69,10 +69,11 @@ class ListMedia extends ListRecords
                             ->title('Upload failed — file not found.')
                             ->danger()
                             ->send();
+
                         return;
                     }
 
-                    $library     = MediaLibrary::getInstance();
+                    $library = MediaLibrary::getInstance();
                     $absolutePath = Storage::disk('public')->path($tmpPath);
                     $originalName = basename($tmpPath);
 
@@ -82,14 +83,14 @@ class ListMedia extends ListRecords
                         ->usingFileName($originalName)
                         ->withCustomProperties([
                             'alt_text' => $data['alt_text'] ?? null,
-                            'caption'  => $data['caption']  ?? null,
-                            'credits'  => $data['credits']  ?? null,
+                            'caption' => $data['caption'] ?? null,
+                            'credits' => $data['credits'] ?? null,
                         ])
                         ->toMediaCollection($data['collection_name'] ?? 'images');
 
                     Notification::make()
                         ->title('Media uploaded successfully')
-                        ->body($media->name . ' has been added to the library.')
+                        ->body($media->name.' has been added to the library.')
                         ->success()
                         ->send();
                 }),

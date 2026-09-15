@@ -11,6 +11,7 @@
         "filament/filament": "^3.3",
         "filament/spatie-laravel-media-library-plugin": "^3.2",
         "laravel/framework": "^13.17",
+        "laravel/sanctum": "^4.3",
         "laravel/tinker": "^3.0",
         "spatie/laravel-activitylog": "^5.1",
         "spatie/laravel-medialibrary": "^11.23",

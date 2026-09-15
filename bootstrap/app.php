@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Middleware\RedirectMiddleware;
+use Illuminate\Auth\AuthenticationException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -27,7 +29,14 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $exceptions->render(function (Throwable $e, Request $request) {
             if ($request->is('api/*')) {
-                $statusCode = $e instanceof HttpExceptionInterface ? $e->getStatusCode() : 500;
+                $statusCode = match (true) {
+                    $e instanceof HttpExceptionInterface => $e->getStatusCode(),
+                    $e instanceof ValidationException => $e->status,
+                    $e instanceof AuthenticationException => 401,
+                    $e instanceof ModelNotFoundException => 404,
+                    default => 500,
+                };
+
                 $message = $e->getMessage() ?: 'An unexpected server error occurred.';
 
                 if ($statusCode === 500 && ! config('app.debug')) {

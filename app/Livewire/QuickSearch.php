@@ -2,7 +2,9 @@
 
 namespace App\Livewire;
 
+use App\Models\Category;
 use App\Models\Post;
+use App\Models\SearchLog;
 use App\Services\AnalyticsService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Collection;
@@ -47,14 +49,14 @@ class QuickSearch extends Component
             }
         }
 
-        $suggestions = \App\Models\SearchLog::select('query')
+        $suggestions = SearchLog::select('query')
             ->selectRaw('count(*) as count')
             ->groupBy('query')
             ->orderByDesc('count')
             ->limit(4)
             ->pluck('query');
 
-        $topCategories = \App\Models\Category::active()
+        $topCategories = Category::active()
             ->whereHas('posts', fn ($q) => $q->published())
             ->orderBy('sort_order')
             ->limit(4)

@@ -21,8 +21,8 @@ return new class extends Migration
 
         // Seed the singleton row so it always exists.
         DB::table('media_library')->insert([
-            'id'         => 1,
-            'name'       => 'Global Media Library',
+            'id' => 1,
+            'name' => 'Global Media Library',
             'created_at' => now(),
             'updated_at' => now(),
         ]);

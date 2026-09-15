@@ -13,10 +13,10 @@ class AdminUserSeeder extends Seeder
         $admin = User::firstOrCreate(
             ['email' => 'admin@blog.test'],
             [
-                'name'              => 'Super Admin',
-                'password'          => Hash::make('password'),
+                'name' => 'Super Admin',
+                'password' => Hash::make('password'),
                 'email_verified_at' => now(),
-                'is_active'         => true,
+                'is_active' => true,
             ]
         );
 
@@ -26,10 +26,10 @@ class AdminUserSeeder extends Seeder
         $editor = User::firstOrCreate(
             ['email' => 'editor@blog.test'],
             [
-                'name'              => 'Blog Editor',
-                'password'          => Hash::make('password'),
+                'name' => 'Blog Editor',
+                'password' => Hash::make('password'),
                 'email_verified_at' => now(),
-                'is_active'         => true,
+                'is_active' => true,
             ]
         );
 
@@ -39,10 +39,10 @@ class AdminUserSeeder extends Seeder
         $author = User::firstOrCreate(
             ['email' => 'author@blog.test'],
             [
-                'name'              => 'Blog Author',
-                'password'          => Hash::make('password'),
+                'name' => 'Blog Author',
+                'password' => Hash::make('password'),
                 'email_verified_at' => now(),
-                'is_active'         => true,
+                'is_active' => true,
             ]
         );
 

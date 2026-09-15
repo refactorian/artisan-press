@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Category;
 use App\Models\Page;
 use App\Models\Post;
+use App\Models\Series;
 use App\Models\Setting;
 use App\Models\Tag;
 use App\Models\User;
@@ -57,7 +58,7 @@ class SeoService
         ];
     }
 
-    public function generate(Post|Page|Category|Tag|User|null $model = null): array
+    public function generate(Post|Page|Category|Tag|User|Series|null $model = null): array
     {
         $siteName = Setting::get('site_name', config('app.name', 'Laravel Modern Blog'));
         $siteUrl = url('/');
@@ -112,8 +113,48 @@ class SeoService
             $model instanceof Category => $this->generateForCategory($model, $siteName, $twitterHandle),
             $model instanceof Tag => $this->generateForTag($model, $siteName, $twitterHandle),
             $model instanceof User => $this->generateForAuthor($model, $siteName, $twitterHandle),
+            $model instanceof Series => $this->generateForSeries($model, $siteName, $twitterHandle),
             default => [],
         };
+    }
+
+    /**
+     * Generate SEO metadata for a Series.
+     *
+     * @return array<string, mixed>
+     */
+    public function generateForSeries(Series $series, string $siteName, string $twitterHandle): array
+    {
+        $title = "Series: {$series->name}";
+        $description = $series->description ?: "Read articles in the {$series->name} series.";
+        $canonicalUrl = url("/series/{$series->slug}");
+
+        return [
+            'title' => "{$title} | {$siteName}",
+            'meta_title' => $title,
+            'meta_description' => $description,
+            'canonical_url' => $canonicalUrl,
+            'robots' => 'index, follow',
+            'og' => [
+                'site_name' => $siteName,
+                'type' => 'website',
+                'title' => $title,
+                'description' => $description,
+                'url' => $canonicalUrl,
+            ],
+            'twitter' => [
+                'card' => 'summary',
+                'site' => $twitterHandle,
+                'title' => $title,
+                'description' => $description,
+            ],
+            'schema' => [
+                '@context' => 'https://schema.org',
+                '@type' => 'CollectionPage',
+                'name' => $series->name,
+                'url' => $canonicalUrl,
+            ],
+        ];
     }
 
     /**

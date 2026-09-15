@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Notifications\Notifiable;
 use Spatie\Activitylog\Models\Concerns\LogsActivity;
 use Spatie\Activitylog\Support\LogOptions;
 
@@ -20,7 +21,7 @@ use Spatie\Activitylog\Support\LogOptions;
 ])]
 class Subscriber extends Model
 {
-    use HasFactory, LogsActivity;
+    use HasFactory, LogsActivity, Notifiable;
 
     protected function casts(): array
     {

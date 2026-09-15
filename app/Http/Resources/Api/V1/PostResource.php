@@ -18,6 +18,26 @@ class PostResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $user = $request->user('sanctum') ?? $request->user();
+
+        $isLiked = false;
+        if (isset($this->is_liked)) {
+            $isLiked = (bool) $this->is_liked;
+        } elseif ($user) {
+            $isLiked = $this->relationLoaded('likes')
+                ? $this->likes->contains('id', $user->id)
+                : $this->likes()->where('user_id', $user->id)->exists();
+        }
+
+        $isBookmarked = false;
+        if (isset($this->is_bookmarked)) {
+            $isBookmarked = (bool) $this->is_bookmarked;
+        } elseif ($user) {
+            $isBookmarked = $this->relationLoaded('bookmarks')
+                ? $this->bookmarks->contains('id', $user->id)
+                : $this->bookmarks()->where('user_id', $user->id)->exists();
+        }
+
         return [
             'id' => $this->id,
             'title' => $this->title,
@@ -25,6 +45,9 @@ class PostResource extends JsonResource
             'excerpt' => $this->excerpt,
             'reading_time' => $this->reading_time ?: $this->calculateReadingTime(),
             'view_count' => (int) $this->view_count,
+            'likes_count' => isset($this->likes_count) ? (int) $this->likes_count : (int) $this->likes()->count(),
+            'is_liked' => $isLiked,
+            'is_bookmarked' => $isBookmarked,
             'is_featured' => (bool) $this->is_featured,
             'is_hero' => (bool) $this->is_hero,
             'published_at' => $this->published_at?->toIso8601String(),

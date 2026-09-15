@@ -4,7 +4,8 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\MediaResource\Pages;
 use App\Models\MediaAsset;
-use Filament\Forms;
+use App\Models\MediaLibrary;
+use App\Models\Post;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Textarea;
@@ -18,6 +19,8 @@ use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class MediaResource extends Resource
 {
@@ -143,7 +146,7 @@ class MediaResource extends Resource
             ->filters([
                 SelectFilter::make('collection_name')
                     ->label('Collection')
-                    ->options(fn () => \Spatie\MediaLibrary\MediaCollections\Models\Media::query()
+                    ->options(fn () => Media::query()
                         ->distinct()
                         ->pluck('collection_name', 'collection_name')
                         ->toArray()
@@ -153,13 +156,13 @@ class MediaResource extends Resource
                     ->label('Source')
                     ->options([
                         'library' => 'Media Library (standalone)',
-                        'posts'   => 'Post attachments',
+                        'posts' => 'Post attachments',
                     ])
                     ->query(function ($query, array $data) {
                         if ($data['value'] === 'library') {
-                            $query->where('model_type', \App\Models\MediaLibrary::class);
+                            $query->where('model_type', MediaLibrary::class);
                         } elseif ($data['value'] === 'posts') {
-                            $query->where('model_type', \App\Models\Post::class);
+                            $query->where('model_type', Post::class);
                         }
                     }),
             ])
@@ -192,6 +195,7 @@ class MediaResource extends Resource
                         $record->setCustomProperty('caption', $data['caption'] ?? null);
                         $record->setCustomProperty('credits', $data['credits'] ?? null);
                         $record->save();
+
                         return $record;
                     }),
 
@@ -207,7 +211,7 @@ class MediaResource extends Resource
     /**
      * Show ALL media records across all model types (posts, pages, standalone library).
      */
-    public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
+    public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()->orderBy('created_at', 'desc');
     }
@@ -216,7 +220,7 @@ class MediaResource extends Resource
     {
         return [
             'index' => Pages\ListMedia::route('/'),
-            'edit'  => Pages\EditMedia::route('/{record}/edit'),
+            'edit' => Pages\EditMedia::route('/{record}/edit'),
         ];
     }
 }
